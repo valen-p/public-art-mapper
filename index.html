@@ -99,7 +99,7 @@
             esriConfig.apiKey = "APTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "satellite", // Changed to a stable basemap
+                basemap: "streets-night-vector", // Changed to a stable basemap
                 spatialReference: { wkid: 4326 } // Ensure spatial reference is consistent
             });
 
@@ -122,9 +122,9 @@
             });
             view.ui.add(searchWidget, "top-left");
 
-            // Add Feature Layer
+            // Add Feature Layer (Survey123 results)
             const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer/0", // Feature layer URL
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer", // Survey feature layer
                 outFields: ["Title", "Description", "attachments"]
             });
             map.add(featureLayer);
@@ -138,56 +138,15 @@
             // State to store the selected location
             let selectedLocation = null;
 
-            // Enable adding public art
+            // Enable adding public art (open Survey123)
             addArtBtn.addEventListener("click", () => {
-                view.popup.close();
-                view.on("click", (event) => {
-                    selectedLocation = event.mapPoint; // Save clicked point location
-                    formContainer.style.display = "block";
-                });
-                alert("Click on the map to select a location for the art.");
+                window.open("https://arcg.is/19Lz8m", "_blank"); // Open the Survey123 form in a new tab
             });
 
             // Cancel adding art
             cancelBtn.addEventListener("click", () => {
                 formContainer.style.display = "none";
                 selectedLocation = null; // Reset location
-            });
-
-            // Save new art
-            saveArtBtn.addEventListener("click", async () => {
-                const title = document.getElementById("artTitle").value;
-                const description = document.getElementById("artDescription").value;
-                const photoFile = document.getElementById("artPhoto").files[0];
-
-                if (!title || !selectedLocation) {
-                    alert("Please provide a title and select a location on the map.");
-                    return;
-                }
-
-                const newGraphic = new Graphic({
-                    geometry: selectedLocation,
-                    attributes: {
-                        Title: title,
-                        Description: description
-                    },
-                    symbol: {
-                        type: "picture-marker",
-                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
-                        width: "32px",
-                        height: "32px"
-                    }
-                });
-
-                featureLayer.applyEdits({
-                    addFeatures: [newGraphic]
-                }).then(() => {
-                    alert("Public art added successfully!");
-                    formContainer.style.display = "none";
-                    selectedLocation = null; // Reset location after saving
-                }).catch((err) => {
-                    console.error("Error adding feature: ", err);
-                });
             });
 
             // Popup to show details when a point is clicked
