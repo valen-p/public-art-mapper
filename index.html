@@ -212,27 +212,28 @@
                         Description: description
                     },
                     symbol: {
-                        type: "picture-marker",
-                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image as marker
-                        width: "32px",
-                        height: "32px"
+                        type: "simple-marker",
+                        color: "blue",
+                        size: "12px"
                     }
                 });
 
+                // Apply edit to add the new graphic
                 featureLayer.applyEdits({
                     addFeatures: [newGraphic]
-                }).then(() => {
-                    // Add attachment (upload image)
-                    featureLayer.addAttachment({
-                        objectId: newGraphic.attributes.OBJECTID,
-                        attachment: photoFile
-                    }).then(() => {
-                        alert("Public art added successfully!");
-                        formContainer.style.display = "none";
-                        selectedLocation = null; // Reset location after saving
-                    }).catch((err) => {
-                        console.error("Error adding attachment: ", err);
-                    });
+                }).then((editResult) => {
+                    const objectId = editResult.addedFeatures[0].attributes.OBJECTID;
+
+                    // Now upload the image as an attachment to the new feature
+                    if (photoFile) {
+                        featureLayer.addAttachment(objectId, photoFile).then(() => {
+                            alert("Public art added successfully with image!");
+                            formContainer.style.display = "none";
+                            selectedLocation = null; // Reset location after saving
+                        }).catch((err) => {
+                            console.error("Error adding attachment: ", err);
+                        });
+                    }
                 }).catch((err) => {
                     console.error("Error adding feature: ", err);
                 });
