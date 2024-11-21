@@ -14,12 +14,12 @@
             width: 100%;
         }
 
-        /* Info box styling with adjusted position (below widgets) */
+        /* Info box styling positioned in the top-right corner */
         .infoBox {
             position: absolute;
             z-index: 10;
-            top: 80px;  /* Placing it below the widgets */
-            left: 10px;
+            top: 10px;
+            right: 10px;
             background-color: #c99000;
             color: white;
             padding: 16px;
@@ -63,18 +63,17 @@
         /* Custom styling for the popup */
         .esri-popup {
             position: absolute;
-            top: 100px;  /* Lowered the popup to avoid it being too high up */
+            top: 10px;  /* Lowered the popup a bit from the top */
             right: 10px; /* Positioned to the right side */
-            width: 300px;  /* Reduced width for smaller size */
-            max-height: 400px; /* Set a max height for the popup */
-            height: auto;
+            width: 250px;  /* Set smaller width */
+            max-height: 300px; /* Set max height to avoid overflow */
             overflow-y: auto;
             margin-top: 10px;
         }
 
-        /* Popup content styling to ensure it's visible */
+        /* Ensuring the popup content is not too big */
         .esri-popup__main-container {
-            max-height: none !important; /* Ensure no scrolling */
+            max-height: 300px !important; /* Set max height for the content */
         }
 
         .esri-popup__content {
@@ -84,8 +83,8 @@
         /* Ensuring the popup button is positioned well */
         .esri-popup__close {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            right: 5px;
         }
 
     </style>
