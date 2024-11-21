@@ -1,115 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <meta charset="utf-8" />
-   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-   <title>Public Art Collector</title>
-   <style>
-       html,
-       body,
-       #viewDiv {
-           padding: 0;
-           margin: 0;
-           height: 100%;
-           width: 100%;
-       }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Public Art Mapper</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
 
+        .infoBox {
+            position: absolute;
+            z-index: 10;
+            top: 10px;
+            right: 10px;
+            background-color: #c99000;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            width: 250px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-       .addRecordBtn {
-           position: absolute;
-           z-index: 10;
-           top: 10px;
-           right: 10px;
-           background-color: #0079c1;
-           color: white;
-           padding: 8px 16px;
-           border: none;
-           border-radius: 4px;
-           font-size: 14px;
-           cursor: pointer;
-           text-decoration: none;
-       }
+        .infoBox h1 {
+            font-size: 18px;
+            margin: 0 0 8px;
+        }
 
+        .infoBox p {
+            font-size: 14px;
+            margin: 0 0 12px;
+        }
 
-       .addRecordBtn:hover {
-           background-color: #005a87;
-       }
-   </style>
-   <!-- Load the ArcGIS API for JavaScript -->
-   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
-   <script src="https://js.arcgis.com/4.26/"></script>
-   <script>
-       require([
-           "esri/config",
-           "esri/Map",
-           "esri/views/MapView",
-           "esri/widgets/Locate",
-           "esri/widgets/Search",
-           "esri/layers/FeatureLayer"
-       ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-           esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
-          
-           const map = new Map({
-               basemap: "streets-night-vector"
-           });
+        .addRecordBtn {
+            display: inline-block;
+            background-color: #0079c1;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
 
+        .addRecordBtn:hover {
+            background-color: #005a87;
+        }
+    </style>
+    <!-- Load the ArcGIS API for JavaScript -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.26/"></script>
+    <script>
+        require([
+            "esri/config", 
+            "esri/Map", 
+            "esri/views/MapView", 
+            "esri/widgets/Locate", 
+            "esri/widgets/Search",
+            "esri/layers/FeatureLayer"
+        ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
+            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+            
+            const map = new Map({
+                basemap: "streets-night-vector" 
+            });
 
-           const view = new MapView({
-               container: "viewDiv",
-               map: map,
-               center: [-82.3248, 29.6516],
-               zoom: 12
-           });
+            const view = new MapView({
+                container: "viewDiv", 
+                map: map, 
+                center: [-82.3248, 29.6516], 
+                zoom: 12 
+            });
 
+            view.when(() => {
+                console.log("MapView is loaded");
 
-           view.when(() => {
-               console.log("MapView is loaded");
+                const locateBtn = new Locate({
+                    view: view
+                });
 
+                view.ui.add(locateBtn, {
+                    position: "top-left"
+                });
 
-               const locateBtn = new Locate({
-                   view: view
-               });
+                const searchWidget = new Search({
+                    view: view
+                });
 
+                view.ui.add(searchWidget, {
+                    position: "top-left"
+                });
 
-               view.ui.add(locateBtn, {
-                   position: "top-left"
-               });
+                const layer = new FeatureLayer({
+                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                    popupTemplate: {
+                        title: "{give_me_it_a_name}", // Title from the "give_me_it_a_name" field
+                        content: [
+                            {
+                                type: "fields",
+                                fieldInfos: [] // Automatically display all fields
+                            },
+                            {
+                                type: "attachments" // Show attached images/files
+                            }
+                        ]
+                    }
+                });
 
-
-               const searchWidget = new Search({
-                   view: view
-               });
-
-
-               view.ui.add(searchWidget, {
-                   position: "top-left"
-               });
-
-
-               const layer = new FeatureLayer({
-                   url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                   popupTemplate: {
-                       title: "{give_me_it_a_name}", // Title from the "give_me_it_a_name" field
-                       content: [
-                           {
-                               type: "fields",
-                               fieldInfos: [] // Automatically display all fields
-                           },
-                           {
-                               type: "attachments" // Show attached images/files
-                           }
-                       ]
-                   }
-               });
-
-
-               map.add(layer);
-           });
-       });
-   </script>
+                map.add(layer);
+            });
+        });
+    </script>
 </head>
 <body>
-   <div id="viewDiv"></div>
-   <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+    <div id="viewDiv"></div>
+    <div class="infoBox">
+        <h1>Public Art Mapper</h1>
+        <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
+        <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+        <p>Check out what others have found by clicking the red points on the map :)</p>
+    </div>
 </body>
 </html>
