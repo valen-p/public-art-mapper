@@ -86,7 +86,28 @@
 
                 // Create feature layer from feature service
                 const layer = new FeatureLayer({
-                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer" // Your feature layer URL
+                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer", // Your feature layer URL
+                    popupTemplate: {
+                        title: "{Name}", // Display the "Name" field as the popup title
+                        content: [
+                            {
+                                type: "media",
+                                mediaInfos: [
+                                    {
+                                        title: "<b>Public Art Image</b>",
+                                        type: "image",
+                                        value: {
+                                            sourceURL: "{Image}" // Display the "Image" field as a media image
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                type: "text",
+                                text: "Description: {Description}" // Display a description field
+                            }
+                        ]
+                    }
                 });
 
                 // Add the feature layer to the map
