@@ -92,21 +92,22 @@
             "esri/layers/FeatureLayer", 
             "esri/widgets/Locate", 
             "esri/widgets/Search",
-            "esri/Graphic"
-        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic) => {
+            "esri/Graphic",
+            "esri/PopupTemplate"
+        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic, PopupTemplate) => {
 
             // Set the API key
             esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "streets-night-vector"
+                basemap: "streets-night-vector" // Corrected basemap URL
             });
 
             const view = new MapView({
                 container: "viewDiv",
                 map: map,
                 center: [-82.3248, 29.6516], // Centered on Gainesville, FL
-                zoom: 12
+                zoom: 12 // Adjust zoom for a better view
             });
 
             // Add Locate and Search widgets
@@ -120,9 +121,17 @@
             });
             view.ui.add(searchWidget, "top-left");
 
-            // Add Feature Layer
+            // Create a Feature Layer for public art
             const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer"
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // Replace with your actual feature layer URL
+                outFields: ["*"], // Query all fields for each feature
+                popupTemplate: new PopupTemplate({
+                    title: "{Title}",
+                    content: `
+                        <strong>Description:</strong> {Description}<br>
+                        <img src="{Image}" alt="Art Image" style="width: 200px; height: auto;">
+                    ` // Replace {Image} with the correct field name for the image URL
+                })
             });
             map.add(featureLayer);
 
@@ -162,15 +171,17 @@
                     return;
                 }
 
+                // Create a new graphic for the public art
                 const newGraphic = new Graphic({
                     geometry: selectedLocation,
                     attributes: {
                         Title: title,
-                        Description: description
+                        Description: description,
+                        Image: URL.createObjectURL(photoFile) // Temporarily create an image URL for display
                     },
                     symbol: {
                         type: "picture-marker",
-                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
+                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image as marker
                         width: "32px",
                         height: "32px"
                     }
