@@ -1,107 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Art Mapper</title>
-    <!-- Esri ArcGIS JS API -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
-    <script src="https://js.arcgis.com/4.26/"></script>
-    <!-- Custom Styles -->
     <style>
-        body, html {
-            margin: 0;
+        html, body, #viewDiv {
             padding: 0;
+            margin: 0;
             height: 100%;
-        }
-
-        header {
-            text-align: center;
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-
-        #viewDiv {
-            height: calc(100% - 50px);
             width: 100%;
         }
+
+        .addArtBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background-color: #0079c1;
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .addArtBtn:hover {
+            background-color: #005a87;
+        }
+
+        #formContainer {
+            display: none;
+            position: absolute;
+            z-index: 10;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        #formContainer input, #formContainer textarea {
+            width: 100%;
+            margin-bottom: 8px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #formContainer button {
+            padding: 8px 12px;
+            background-color: #0079c1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #formContainer button:hover {
+            background-color: #005a87;
+        }
     </style>
+    <!-- ArcGIS API for JavaScript -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.26/"></script>
 </head>
 <body>
-    <header>
-        <h1>Public Art Mapper</h1>
-    </header>
     <div id="viewDiv"></div>
+    <button class="addArtBtn" id="addArtBtn">Add Public Art</button>
+
+    <!-- Form for adding new public art -->
+    <div id="formContainer">
+        <h3>Add Public Art</h3>
+        <input type="text" id="artTitle" placeholder="Art Title" required>
+        <textarea id="artDescription" rows="3" placeholder="Description"></textarea>
+        <input type="file" id="artPhoto" accept="image/*">
+        <button id="saveArtBtn">Save</button>
+        <button id="cancelBtn">Cancel</button>
+    </div>
+
     <script>
         require([
-            "esri/Map",
-            "esri/views/MapView",
-            "esri/layers/FeatureLayer",
-            "esri/widgets/Editor",
+            "esri/config", 
+            "esri/Map", 
+            "esri/views/MapView", 
+            "esri/layers/FeatureLayer", 
+            "esri/widgets/Locate", 
             "esri/widgets/Search",
-            "esri/identity/IdentityManager"
-        ], function (Map, MapView, FeatureLayer, Editor, Search, IdentityManager) {
+            "esri/Graphic"
+        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic) => {
 
-            // Step 1: Set up API Key
-            const apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ"; // 
-            IdentityManager.registerAPIKey(apiKey);
+            // Set the API key
+            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
-            // Step 2: Create the map
             const map = new Map({
-                basemap: "streets-vector" // Use a visually appealing basemap
+                basemap: "satellite"
             });
 
-            // Step 3: Set up the view
             const view = new MapView({
-                container: "viewDiv", // Reference to the div in index.html
+                container: "viewDiv",
                 map: map,
                 center: [-98.5795, 39.8283], // Centered on the US
                 zoom: 4
             });
 
-            // Step 4: Add a Feature Layer for public art
-            const publicArtLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // ArcGIS Online feature layer URL
-                outFields: ["*"], // Fetch all fields for display
-                popupTemplate: {
-                    title: "{Title}", // Dynamic titles from the feature layer
-                    content: "<p>{Description}</p><img src='{Photo_URL}' alt='Art Photo' width='200'>"
-                }
-            });
-            map.add(publicArtLayer);
-
-            // Step 5: Add the Editor Widget
-            const editor = new Editor({
-                view: view,
-                layerInfos: [{
-                    layer: publicArtLayer,
-                    fieldConfig: [
-                        {
-                            name: "Title",
-                            label: "Art Title",
-                            required: true
-                        },
-                        {
-                            name: "Description",
-                            label: "Description",
-                            required: true
-                        },
-                        {
-                            name: "Photo_URL",
-                            label: "Photo URL"
-                        }
-                    ]
-                }]
-            });
-            view.ui.add(editor, "top-right");
-
-            // Step 6: Add a Search Widget
-            const search = new Search({
+            // Add Locate and Search widgets
+            const locateWidget = new Locate({
                 view: view
             });
-            view.ui.add(search, "top-left");
+            view.ui.add(locateWidget, "top-left");
 
+            const searchWidget = new Search({
+                view: view
+            });
+            view.ui.add(searchWidget, "top-left");
+
+            // Add Feature Layer
+            const featureLayer = new FeatureLayer({
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer"
+            });
+            map.add(featureLayer);
+
+            // DOM Elements
+            const addArtBtn = document.getElementById("addArtBtn");
+            const formContainer = document.getElementById("formContainer");
+            const saveArtBtn = document.getElementById("saveArtBtn");
+            const cancelBtn = document.getElementById("cancelBtn");
+
+            // Show form when Add button is clicked
+            addArtBtn.addEventListener("click", () => {
+                formContainer.style.display = "block";
+            });
+
+            // Cancel adding art
+            cancelBtn.addEventListener("click", () => {
+                formContainer.style.display = "none";
+            });
+
+            // Save new art
+            saveArtBtn.addEventListener("click", async () => {
+                const title = document.getElementById("artTitle").value;
+                const description = document.getElementById("artDescription").value;
+                const photoFile = document.getElementById("artPhoto").files[0];
+
+                if (!title || !photoFile) {
+                    alert("Title and photo are required.");
+                    return;
+                }
+
+                // Get the current location
+                const point = view.center;
+
+                const newGraphic = new Graphic({
+                    geometry: point,
+                    attributes: {
+                        Title: title,
+                        Description: description
+                    },
+                    symbol: {
+                        type: "picture-marker",
+                        url: URL.createObjectURL(photoFile),
+                        width: "24px",
+                        height: "24px"
+                    }
+                });
+
+                featureLayer.applyEdits({
+                    addFeatures: [newGraphic]
+                }).then(() => {
+                    alert("Art added successfully!");
+                    formContainer.style.display = "none";
+                }).catch((err) => {
+                    console.error("Error adding feature: ", err);
+                });
+            });
         });
     </script>
 </body>
