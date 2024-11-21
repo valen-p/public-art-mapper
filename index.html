@@ -66,7 +66,6 @@
             background-color: #005a87;
         }
     </style>
-    <!-- ArcGIS API for JavaScript -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.26/"></script>
 </head>
@@ -74,7 +73,6 @@
     <div id="viewDiv"></div>
     <button class="addArtBtn" id="addArtBtn">Add Public Art</button>
 
-    <!-- Form for adding new public art -->
     <div id="formContainer">
         <h3>Add Public Art</h3>
         <input type="text" id="artTitle" placeholder="Art Title" required>
@@ -89,91 +87,80 @@
             "esri/config", 
             "esri/Map", 
             "esri/views/MapView", 
-            "esri/layers/FeatureLayer", 
             "esri/widgets/Locate", 
             "esri/widgets/Search",
+            "esri/layers/FeatureLayer",
             "esri/Graphic"
-        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic) => {
+        ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer, Graphic) => {
 
-            // Set the API key
             esriConfig.apiKey = "APTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "streets-vector", // Changed to a stable basemap
+                basemap: "streets-vector" // Using a more stable basemap
             });
 
             const view = new MapView({
-                container: "viewDiv",
+                container: "viewDiv", // Reference to the DOM node that will contain the view
                 map: map,
-                center: [-82.3248, 29.6516], // Centered on Gainesville, FL
-                zoom: 12,
+                center: [-82.3248, 29.6516], // Center the map on Gainesville, FL
+                zoom: 12 // Zoom level
             });
 
-            // Add Locate and Search widgets
-            const locateWidget = new Locate({
-                view: view
-            });
-            view.ui.add(locateWidget, "top-left");
+            view.when(() => {
+                console.log("MapView is loaded");
 
-            const searchWidget = new Search({
-                view: view
-            });
-            view.ui.add(searchWidget, "top-left");
+                // Add the Locate widget
+                const locateWidget = new Locate({
+                    view: view
+                });
+                view.ui.add(locateWidget, "top-left");
 
-            // Add Feature Layer (Survey123 results)
-            const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer", // Survey feature layer
-                outFields: ["Title", "Description", "attachments"]
-            });
-            map.add(featureLayer);
+                // Add the Search widget
+                const searchWidget = new Search({
+                    view: view
+                });
+                view.ui.add(searchWidget, "top-left");
 
-            // DOM Elements
-            const addArtBtn = document.getElementById("addArtBtn");
-            const formContainer = document.getElementById("formContainer");
-            const saveArtBtn = document.getElementById("saveArtBtn");
-            const cancelBtn = document.getElementById("cancelBtn");
+                // Add Feature Layer (Survey123 results)
+                const featureLayer = new FeatureLayer({
+                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer", // URL to Survey123 feature layer
+                    outFields: ["Title", "Description", "attachments"]
+                });
+                map.add(featureLayer);
 
-            // State to store the selected location
-            let selectedLocation = null;
+                // Add event listeners for the "Add Public Art" button
+                const addArtBtn = document.getElementById("addArtBtn");
+                addArtBtn.addEventListener("click", () => {
+                    window.open("https://arcg.is/19Lz8m", "_blank"); // Open the Survey123 form in a new tab
+                });
 
-            // Enable adding public art (open Survey123)
-            addArtBtn.addEventListener("click", () => {
-                window.open("https://arcg.is/19Lz8m", "_blank"); // Open the Survey123 form in a new tab
-            });
+                // Popup to show feature details when clicked
+                view.on("click", (event) => {
+                    const graphic = event.graphic;
+                    if (graphic) {
+                        const title = graphic.attributes.Title;
+                        const description = graphic.attributes.Description;
+                        const attachmentInfos = graphic.attributes.attachments;
 
-            // Cancel adding art
-            cancelBtn.addEventListener("click", () => {
-                formContainer.style.display = "none";
-                selectedLocation = null; // Reset location
-            });
+                        featureLayer.queryAttachments({
+                            objectId: graphic.attributes.OBJECTID,
+                        }).then((attachmentInfos) => {
+                            const attachment = attachmentInfos[0];
+                            const attachmentUrl = `${featureLayer.url}/${graphic.layer.id}/attachments/${graphic.attributes.OBJECTID}/${attachment.id}`;
 
-            // Popup to show details when a point is clicked
-            view.on("click", (event) => {
-                const graphic = event.graphic;
-                if (graphic) {
-                    const title = graphic.attributes.Title;
-                    const description = graphic.attributes.Description;
-                    const attachmentInfos = graphic.attributes.attachments;
-
-                    // Fetch the first attachment (image)
-                    featureLayer.queryAttachments({
-                        objectId: graphic.attributes.OBJECTID,
-                    }).then((attachmentInfos) => {
-                        const attachment = attachmentInfos[0];
-                        const attachmentUrl = `${featureLayer.url}/${graphic.layer.id}/attachments/${graphic.attributes.OBJECTID}/${attachment.id}`;
-
-                        view.popup.open({
-                            title: title,
-                            content: `
-                                <p>${description}</p>
-                                <img src="${attachmentUrl}" alt="Art Image" width="300">
-                            `,
-                            location: event.mapPoint
+                            view.popup.open({
+                                title: title,
+                                content: `
+                                    <p>${description}</p>
+                                    <img src="${attachmentUrl}" alt="Art Image" width="300">
+                                `,
+                                location: event.mapPoint
+                            });
+                        }).catch((error) => {
+                            console.error("Error fetching attachment: ", error);
                         });
-                    }).catch((error) => {
-                        console.error("Error fetching attachment: ", error);
-                    });
-                }
+                    }
+                });
             });
         });
     </script>
