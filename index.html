@@ -63,11 +63,12 @@
         /* Custom styling for the popup */
         .esri-popup {
             position: absolute;
-            top: 60px;  /* Lower the popup position */
-            right: 10px; /* Right side of the screen */
+            top: 100px;  /* Lowered the popup to avoid it being too high up */
+            right: 10px; /* Positioned to the right side */
             width: 300px;  /* Reduced width for smaller size */
+            max-height: 400px; /* Set a max height for the popup */
             height: auto;
-            overflow: visible;
+            overflow-y: auto;
             margin-top: 10px;
         }
 
