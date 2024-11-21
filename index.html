@@ -66,9 +66,9 @@
             background-color: #005a87;
         }
     </style>
-    <!-- ArcGIS API for JavaScript -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
-    <script src="https://js.arcgis.com/4.26/"></script>
+    <!-- ArcGIS API for JavaScript (Version 4.23) -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.23/"></script>
 </head>
 <body>
     <div id="viewDiv"></div>
@@ -97,11 +97,10 @@
             "esri/Portal"
         ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic, attachments, Portal) => {
 
-            // Set your valid API key
-            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ"; // Replace with your actual API key
+            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ"; // Use your actual API key
 
             const map = new Map({
-                basemap: "satellite" // Corrected to "satellite"
+                basemap: "satellite"
             });
 
             const view = new MapView({
