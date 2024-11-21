@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Public Art Collector</title>
+    <title>Public Art Mapper</title>
     <style>
         html,
         body,
@@ -14,11 +14,32 @@
             width: 100%;
         }
 
-        .addRecordBtn {
+        .infoBox {
             position: absolute;
             z-index: 10;
             top: 10px;
             right: 10px;
+            background-color: #c99000;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            width: 250px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .infoBox h1 {
+            font-size: 18px;
+            margin: 0 0 8px;
+        }
+
+        .infoBox p {
+            font-size: 14px;
+            margin: 0 0 12px;
+        }
+
+        .addRecordBtn {
+            display: inline-block;
             background-color: #0079c1;
             color: white;
             padding: 8px 16px;
@@ -100,6 +121,11 @@
 </head>
 <body>
     <div id="viewDiv"></div>
-    <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+    <div class="infoBox">
+        <h1>Public Art Mapper</h1>
+        <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
+        <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+        <p>Check out what others have found by clicking the red points on the map :)</p>
+    </div>
 </body>
 </html>
