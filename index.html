@@ -99,7 +99,7 @@
             esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "streets"
+                basemap: "streets""
             });
 
             const view = new MapView({
@@ -120,9 +120,16 @@
             });
             view.ui.add(searchWidget, "top-left");
 
-            // Add Feature Layer
+            // Add Feature Layer with popup template
             const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer"
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer"",
+                popupTemplate: {
+                    title: "{Title}",
+                    content: `
+                        <p><strong>Description:</strong> {Description}</p>
+                        <img src="{ImageURL}" alt="{Title}" style="max-width:100%; border-radius:4px;">
+                    `
+                }
             });
             map.add(featureLayer);
 
@@ -157,22 +164,25 @@
                 const description = document.getElementById("artDescription").value;
                 const photoFile = document.getElementById("artPhoto").files[0];
 
-                if (!title || !selectedLocation) {
-                    alert("Please provide a title and select a location on the map.");
+                if (!title || !selectedLocation || !photoFile) {
+                    alert("Please provide a title, select a location on the map, and upload a photo.");
                     return;
                 }
+
+                // Create a unique URL for the image (this assumes your feature layer supports image URLs)
+                const imageUrl = URL.createObjectURL(photoFile);
 
                 const newGraphic = new Graphic({
                     geometry: selectedLocation,
                     attributes: {
                         Title: title,
-                        Description: description
+                        Description: description,
+                        ImageURL: imageUrl
                     },
                     symbol: {
-                        type: "picture-marker",
-                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
-                        width: "32px",
-                        height: "32px"
+                        type: "simple-marker",
+                        color: "red",
+                        size: "10px"
                     }
                 });
 
@@ -190,4 +200,3 @@
     </script>
 </body>
 </html>
-
