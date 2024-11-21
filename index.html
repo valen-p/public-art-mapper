@@ -88,11 +88,14 @@
                 const layer = new FeatureLayer({
                     url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer", // Your feature layer URL
                     popupTemplate: {
-                        title: "{Name}", // Uses the "Name" field as the title (or any suitable field)
+                        title: "{give_me_it_a_name}", // Uses the "give_me_it_a_name" field for the popup title
                         content: [
                             {
                                 type: "fields",
-                                fieldInfos: [] // Automatically includes all fields dynamically
+                                fieldInfos: [] // Includes all fields dynamically
+                            },
+                            {
+                                type: "attachments" // Includes all attachments, like photos or files
                             }
                         ]
                     }
