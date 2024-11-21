@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,9 +67,9 @@
             background-color: #005a87;
         }
     </style>
-    <!-- ArcGIS API for JavaScript (Version 4.23) -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
-    <script src="https://js.arcgis.com/4.23/"></script>
+    <!-- ArcGIS API for JavaScript -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.26/"></script>
 </head>
 <body>
     <div id="viewDiv"></div>
@@ -92,15 +93,14 @@
             "esri/layers/FeatureLayer", 
             "esri/widgets/Locate", 
             "esri/widgets/Search",
-            "esri/Graphic",
-            "esri/rest/attachments",
-            "esri/Portal"
-        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic, attachments, Portal) => {
+            "esri/Graphic"
+        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic) => {
 
-            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ"; // Use your actual API key
+            // Set the API key
+            esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "satellite"
+                basemap: "streets-night-vector"
             });
 
             const view = new MapView({
@@ -110,17 +110,20 @@
                 zoom: 4
             });
 
-            // Add Feature Layer with popup template
+            // Add Locate and Search widgets
+            const locateWidget = new Locate({
+                view: view
+            });
+            view.ui.add(locateWidget, "top-left");
+
+            const searchWidget = new Search({
+                view: view
+            });
+            view.ui.add(searchWidget, "top-left");
+
+            // Add Feature Layer
             const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // Ensure this is your valid Feature Layer URL
-                popupTemplate: {
-                    title: "{Title}",
-                    content: `
-                        <p><strong>Description:</strong> {Description}</p>
-                        <h4>Images:</h4>
-                        <div id="attachmentsContainer"></div>
-                    `
-                }
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer"
             });
             map.add(featureLayer);
 
@@ -130,13 +133,14 @@
             const saveArtBtn = document.getElementById("saveArtBtn");
             const cancelBtn = document.getElementById("cancelBtn");
 
+            // State to store the selected location
             let selectedLocation = null;
 
             // Enable adding public art
             addArtBtn.addEventListener("click", () => {
                 view.popup.close();
                 view.on("click", (event) => {
-                    selectedLocation = event.mapPoint;
+                    selectedLocation = event.mapPoint; // Save clicked point location
                     formContainer.style.display = "block";
                 });
                 alert("Click on the map to select a location for the art.");
@@ -145,7 +149,7 @@
             // Cancel adding art
             cancelBtn.addEventListener("click", () => {
                 formContainer.style.display = "none";
-                selectedLocation = null;
+                selectedLocation = null; // Reset location
             });
 
             // Save new art
@@ -154,12 +158,11 @@
                 const description = document.getElementById("artDescription").value;
                 const photoFile = document.getElementById("artPhoto").files[0];
 
-                if (!title || !selectedLocation || !photoFile) {
-                    alert("Please provide a title, select a location on the map, and upload a photo.");
+                if (!title || !selectedLocation) {
+                    alert("Please provide a title and select a location on the map.");
                     return;
                 }
 
-                // Create a new graphic for the art
                 const newGraphic = new Graphic({
                     geometry: selectedLocation,
                     attributes: {
@@ -167,65 +170,25 @@
                         Description: description
                     },
                     symbol: {
-                        type: "simple-marker",
-                        color: "red",
-                        size: "10px"
+                        type: "picture-marker",
+                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
+                        width: "32px",
+                        height: "32px"
                     }
                 });
 
-                // Add the new feature to the FeatureLayer
-                const editResult = await featureLayer.applyEdits({
+                featureLayer.applyEdits({
                     addFeatures: [newGraphic]
+                }).then(() => {
+                    alert("Public art added successfully!");
+                    formContainer.style.display = "none";
+                    selectedLocation = null; // Reset location after saving
+                }).catch((err) => {
+                    console.error("Error adding feature: ", err);
                 });
-
-                const objectId = editResult.addFeatureResults[0].objectId;
-
-                // Upload the photo as an attachment
-                const attachmentResult = await attachments.addAttachment({
-                    url: featureLayer.url,
-                    objectId: objectId,
-                    attachment: photoFile
-                });
-
-                alert("Public art added successfully!");
-
-                // Hide the form and reset values
-                formContainer.style.display = "none";
-                selectedLocation = null;
-
-                // Clear form fields
-                document.getElementById("artTitle").value = "";
-                document.getElementById("artDescription").value = "";
-                document.getElementById("artPhoto").value = "";
-
-                // Reload the popup to show updated attachments
-                view.popup.reload();
             });
-
-            // Display the attachments in the popup
-            featureLayer.on("trigger-action", (event) => {
-                if (event.action.id === "view-attachments") {
-                    const objectId = view.popup.selectedFeature.attributes.objectId;
-
-                    attachments.queryAttachments({
-                        url: featureLayer.url,
-                        objectId: objectId
-                    }).then((result) => {
-                        const attachmentsContainer = document.getElementById("attachmentsContainer");
-                        attachmentsContainer.innerHTML = "";  // Clear the container before adding new attachments
-
-                        result.attachments.forEach((attachment) => {
-                            const imgElement = document.createElement("img");
-                            imgElement.src = attachment.url;
-                            imgElement.style.maxWidth = "100%";
-                            imgElement.style.borderRadius = "8px";
-                            attachmentsContainer.appendChild(imgElement);
-                        });
-                    });
-                }
-            });
-
         });
     </script>
 </body>
 </html>
+
