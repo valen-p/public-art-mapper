@@ -99,7 +99,7 @@
             esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "satellite"
+                basemap: "streets"
             });
 
             const view = new MapView({
@@ -132,14 +132,23 @@
             const saveArtBtn = document.getElementById("saveArtBtn");
             const cancelBtn = document.getElementById("cancelBtn");
 
-            // Show form when Add button is clicked
+            // State to store the selected location
+            let selectedLocation = null;
+
+            // Enable adding public art
             addArtBtn.addEventListener("click", () => {
-                formContainer.style.display = "block";
+                view.popup.close();
+                view.on("click", (event) => {
+                    selectedLocation = event.mapPoint; // Save clicked point location
+                    formContainer.style.display = "block";
+                });
+                alert("Click on the map to select a location for the art.");
             });
 
             // Cancel adding art
             cancelBtn.addEventListener("click", () => {
                 formContainer.style.display = "none";
+                selectedLocation = null; // Reset location
             });
 
             // Save new art
@@ -148,33 +157,31 @@
                 const description = document.getElementById("artDescription").value;
                 const photoFile = document.getElementById("artPhoto").files[0];
 
-                if (!title || !photoFile) {
-                    alert("Title and photo are required.");
+                if (!title || !selectedLocation) {
+                    alert("Please provide a title and select a location on the map.");
                     return;
                 }
 
-                // Get the current location
-                const point = view.center;
-
                 const newGraphic = new Graphic({
-                    geometry: point,
+                    geometry: selectedLocation,
                     attributes: {
                         Title: title,
                         Description: description
                     },
                     symbol: {
                         type: "picture-marker",
-                        url: URL.createObjectURL(photoFile),
-                        width: "24px",
-                        height: "24px"
+                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
+                        width: "32px",
+                        height: "32px"
                     }
                 });
 
                 featureLayer.applyEdits({
                     addFeatures: [newGraphic]
                 }).then(() => {
-                    alert("Art added successfully!");
+                    alert("Public art added successfully!");
                     formContainer.style.display = "none";
+                    selectedLocation = null; // Reset location after saving
                 }).catch((err) => {
                     console.error("Error adding feature: ", err);
                 });
@@ -183,3 +190,4 @@
     </script>
 </body>
 </html>
+
