@@ -92,22 +92,23 @@
             "esri/layers/FeatureLayer", 
             "esri/widgets/Locate", 
             "esri/widgets/Search",
-            "esri/Graphic",
-            "esri/PopupTemplate"
-        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic, PopupTemplate) => {
+            "esri/Graphic"
+        ], (esriConfig, Map, MapView, FeatureLayer, Locate, Search, Graphic) => {
 
             // Set the API key
             esriConfig.apiKey = "APTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
             const map = new Map({
-                basemap: "streets-night-vector" // Corrected basemap URL
+                basemap: "streets-night-vector", // Changed to a stable basemap
+                spatialReference: { wkid: 4326 } // Ensure spatial reference is consistent
             });
 
             const view = new MapView({
                 container: "viewDiv",
                 map: map,
                 center: [-82.3248, 29.6516], // Centered on Gainesville, FL
-                zoom: 12 // Adjust zoom for a better view
+                zoom: 12,
+                spatialReference: { wkid: 4326 } // Match the spatial reference of the map
             });
 
             // Add Locate and Search widgets
@@ -121,52 +122,12 @@
             });
             view.ui.add(searchWidget, "top-left");
 
-            // Create a Feature Layer for public art
+            // Add Feature Layer
             const featureLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer/0", // Public Art Feature Layer
-                outFields: ["Title", "Description"], // Query the Title and Description fields
-                popupTemplate: new PopupTemplate({
-                    title: "{Title}",
-                    content: `
-                        <strong>Description:</strong> {Description}<br>
-                        <strong>Image:</strong> <img id="artImage" src="" alt="Art Image" style="width: 200px; height: auto;">
-                    `
-                })
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer/0", // Feature layer URL
+                outFields: ["Title", "Description", "attachments"]
             });
-
             map.add(featureLayer);
-
-            // Listen for click events on the map view to trigger the popup
-            view.on("click", (event) => {
-                view.hitTest(event).then((response) => {
-                    const results = response.results;
-                    if (results.length > 0) {
-                        const graphic = results[0].graphic;
-                        if (graphic.layer === featureLayer) {
-                            const objectId = graphic.attributes.OBJECTID;
-
-                            // Fetch attachments associated with the clicked graphic
-                            featureLayer.queryAttachments({
-                                objectId: objectId
-                            }).then((response) => {
-                                const attachmentInfos = response.attachmentInfos;
-                                if (attachmentInfos.length > 0) {
-                                    // Assuming the first attachment is the image we want to display
-                                    const imageUrl = featureLayer.url + "/attachments/" + objectId + "/" + attachmentInfos[0].id;
-                                    const artImage = document.getElementById("artImage");
-                                    artImage.src = imageUrl;
-                                }
-                            });
-
-                            // Show the popup
-                            view.popup.open({
-                                location: event.mapPoint, // Set the location of the popup
-                                features: [graphic] // Pass the clicked graphic to the popup
-                            });
-                        }
-                    }
-                });
-            });
 
             // DOM Elements
             const addArtBtn = document.getElementById("addArtBtn");
@@ -204,7 +165,6 @@
                     return;
                 }
 
-                // Create a new graphic for the public art
                 const newGraphic = new Graphic({
                     geometry: selectedLocation,
                     attributes: {
@@ -212,31 +172,51 @@
                         Description: description
                     },
                     symbol: {
-                        type: "simple-marker",
-                        color: "blue",
-                        size: "12px"
+                        type: "picture-marker",
+                        url: URL.createObjectURL(photoFile), // Temporarily render uploaded image
+                        width: "32px",
+                        height: "32px"
                     }
                 });
 
-                // Apply edit to add the new graphic
                 featureLayer.applyEdits({
                     addFeatures: [newGraphic]
-                }).then((editResult) => {
-                    const objectId = editResult.addedFeatures[0].attributes.OBJECTID;
-
-                    // Now upload the image as an attachment to the new feature
-                    if (photoFile) {
-                        featureLayer.addAttachment(objectId, photoFile).then(() => {
-                            alert("Public art added successfully with image!");
-                            formContainer.style.display = "none";
-                            selectedLocation = null; // Reset location after saving
-                        }).catch((err) => {
-                            console.error("Error adding attachment: ", err);
-                        });
-                    }
+                }).then(() => {
+                    alert("Public art added successfully!");
+                    formContainer.style.display = "none";
+                    selectedLocation = null; // Reset location after saving
                 }).catch((err) => {
                     console.error("Error adding feature: ", err);
                 });
+            });
+
+            // Popup to show details when a point is clicked
+            view.on("click", (event) => {
+                const graphic = event.graphic;
+                if (graphic) {
+                    const title = graphic.attributes.Title;
+                    const description = graphic.attributes.Description;
+                    const attachmentInfos = graphic.attributes.attachments;
+
+                    // Fetch the first attachment (image)
+                    featureLayer.queryAttachments({
+                        objectId: graphic.attributes.OBJECTID,
+                    }).then((attachmentInfos) => {
+                        const attachment = attachmentInfos[0];
+                        const attachmentUrl = `${featureLayer.url}/${graphic.layer.id}/attachments/${graphic.attributes.OBJECTID}/${attachment.id}`;
+
+                        view.popup.open({
+                            title: title,
+                            content: `
+                                <p>${description}</p>
+                                <img src="${attachmentUrl}" alt="Art Image" width="300">
+                            `,
+                            location: event.mapPoint
+                        });
+                    }).catch((error) => {
+                        console.error("Error fetching attachment: ", error);
+                    });
+                }
             });
         });
     </script>
