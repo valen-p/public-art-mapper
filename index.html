@@ -38,6 +38,11 @@
             margin: 0 0 12px;
         }
 
+        /* Add extra margin to the paragraph below the button */
+        .infoBox p:last-child {
+            margin-top: 20px;  /* Adjust the space here */
+        }
+
         .addRecordBtn {
             display: inline-block;
             background-color: #0079c1;
@@ -101,14 +106,14 @@
                 const layer = new FeatureLayer({
                     url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                     popupTemplate: {
-                        title: "{give_me_it_a_name}", // Title from the "give_me_it_a_name" field
+                        title: "{give_me_it_a_name}", 
                         content: [
                             {
                                 type: "fields",
-                                fieldInfos: [] // Automatically display all fields
+                                fieldInfos: [] 
                             },
                             {
-                                type: "attachments" // Show attached images/files
+                                type: "attachments"
                             }
                         ]
                     }
