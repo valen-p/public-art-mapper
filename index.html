@@ -9,7 +9,6 @@
     <script src="https://js.arcgis.com/4.26/"></script>
     <!-- Custom Styles -->
     <style>
-        /* Reset margins and paddings */
         body, html {
             margin: 0;
             padding: 0;
@@ -24,7 +23,7 @@
         }
 
         #viewDiv {
-            height: calc(100% - 50px); /* Leaves space for the header */
+            height: calc(100% - 50px);
             width: 100%;
         }
     </style>
@@ -61,18 +60,18 @@
                 zoom: 4
             });
 
-            // Step 4: Add a Feature Layer for public art (replace URL with your own)
+            // Step 4: Add a Feature Layer for public art
             const publicArtLayer = new FeatureLayer({
-                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // ArcGIS Online Feature Service
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // ArcGIS Online feature layer URL
                 outFields: ["*"], // Fetch all fields for display
                 popupTemplate: {
-                    title: "{Title}", // Use field names for dynamic titles
+                    title: "{Title}", // Dynamic titles from the feature layer
                     content: "<p>{Description}</p><img src='{Photo_URL}' alt='Art Photo' width='200'>"
                 }
             });
             map.add(publicArtLayer);
 
-            // Step 5: Add the Editor Widget for user submissions
+            // Step 5: Add the Editor Widget
             const editor = new Editor({
                 view: view,
                 layerInfos: [{
@@ -97,7 +96,7 @@
             });
             view.ui.add(editor, "top-right");
 
-            // Step 6: Add a Search Widget for ease of navigation
+            // Step 6: Add a Search Widget
             const search = new Search({
                 view: view
             });
