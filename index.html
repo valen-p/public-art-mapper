@@ -61,23 +61,30 @@
         }
 
         /* Custom styling for the popup */
-        .esri-popup__main-container {
-            max-height: none !important; /* Ensure no scrolling */
-        }
-
         .esri-popup {
             position: absolute;
-            top: 20px;
-            right: 10px;
-            width: 250px;  /* Reduced width for smaller size */
+            top: 60px;  /* Lower the popup position */
+            right: 10px; /* Right side of the screen */
+            width: 300px;  /* Reduced width for smaller size */
             height: auto;
             overflow: visible;
             margin-top: 10px;
         }
 
-        /* Make sure the popup content isn't cut off */
+        /* Popup content styling to ensure it's visible */
+        .esri-popup__main-container {
+            max-height: none !important; /* Ensure no scrolling */
+        }
+
         .esri-popup__content {
             max-height: none;
+        }
+
+        /* Ensuring the popup button is positioned well */
+        .esri-popup__close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
 
     </style>
