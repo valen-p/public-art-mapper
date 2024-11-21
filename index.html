@@ -26,6 +26,7 @@
             width: 250px;
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
 
         .infoBox h1 {
@@ -57,6 +58,44 @@
 
         .addRecordBtn:hover {
             background-color: #005a87;
+        }
+
+        /* Minimize button */
+        .minimizeBtn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #fff;
+            color: #c99000;
+            font-size: 18px;
+            width: 20px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 50%;
+        }
+
+        .minimized {
+            height: 40px;
+            overflow: hidden;
+        }
+
+        /* Custom popup styling */
+        .esri-popup {
+            max-width: 300px !important; /* Set a max width */
+            max-height: 250px !important; /* Set the max height to avoid long popups */
+            overflow-y: auto; /* Enable scrolling if content exceeds max height */
+        }
+
+        .esri-popup__main-container {
+            max-height: 250px !important; /* Ensure no popup content overflows */
+            overflow-y: auto;
+        }
+
+        /* Remove duplicate zoom buttons */
+        .esri-widget.esri-widget--zoom {
+            display: none;
         }
     </style>
     <!-- Load the ArcGIS API for JavaScript -->
@@ -120,6 +159,42 @@
                 });
 
                 map.add(layer);
+
+                // Adjust the popup to open on the left and ensure it's not too big
+                layer.on("click", function(event) {
+                    const screenPoint = {
+                        x: event.x,
+                        y: event.y
+                    };
+
+                    view.hitTest(screenPoint).then(function(response) {
+                        const graphic = response.results[0]?.graphic;
+                        if (graphic) {
+                            const popup = view.popup;
+                            popup.open({
+                                location: event.mapPoint,
+                                title: graphic.attributes["give_me_it_a_name"],
+                                content: graphic,
+                                // Ensure popup is to the left
+                                actions: [],
+                                width: 300,
+                                height: 250
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Function to minimize/maximize the info box
+            function toggleInfoBox() {
+                const infoBox = document.querySelector(".infoBox");
+                infoBox.classList.toggle("minimized");
+            }
+            
+            // Add event listener for minimize button
+            document.addEventListener("DOMContentLoaded", function() {
+                const minimizeBtn = document.querySelector(".minimizeBtn");
+                minimizeBtn.addEventListener("click", toggleInfoBox);
             });
         });
     </script>
@@ -127,6 +202,7 @@
 <body>
     <div id="viewDiv"></div>
     <div class="infoBox">
+        <button class="minimizeBtn">-</button>
         <h1>Public Art Mapper</h1>
         <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
         <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
