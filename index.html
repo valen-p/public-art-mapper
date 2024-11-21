@@ -14,13 +14,13 @@
             width: 100%;
         }
 
-        /* Info box styling (adjusted for positioning under the widgets) */
+        /* Info box styling with adjusted position */
         .infoBox {
             position: absolute;
             z-index: 10;
-            top: 60px;  /* Adjusted so it’s under the widgets */
+            top: 60px;  /* Adjusted space to ensure it's below the widgets */
             left: 10px;
-            background-color: #9c7002;
+            background-color: #c99000;
             color: white;
             padding: 16px;
             border-radius: 8px;
@@ -39,9 +39,9 @@
             margin: 0 0 12px;
         }
 
-        /* Add extra margin to the paragraph below the button */
+        /* Extra margin after the Add Record button */
         .infoBox p:last-child {
-            margin-top: 20px; 
+            margin-top: 20px;
         }
 
         .addRecordBtn {
@@ -60,20 +60,26 @@
             background-color: #005a87;
         }
 
-        /* Styling for the popup, ensuring it opens on the right side */
+        /* Custom styling for the popup */
         .esri-popup__main-container {
-            max-height: none !important; /* Allow the popup to fully expand */
+            max-height: none !important; /* Ensure no scrolling */
         }
 
         .esri-popup {
             position: absolute;
             top: 20px;
             right: 10px;
-            width: 300px;  /* You can adjust the width of the popup */
+            width: 280px;  /* Adjusted to be a bit smaller */
             height: auto;
             overflow: visible;
-            margin-top: 10px;  /* Adds a bit of space from the top of the map */
+            margin-top: 10px;
         }
+
+        /* Make sure the popup content isn't cut off */
+        .esri-popup__content {
+            max-height: none;
+        }
+
     </style>
     <!-- Load the ArcGIS API for JavaScript -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
