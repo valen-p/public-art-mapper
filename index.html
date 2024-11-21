@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Art Mapper</title>
+    <!-- Esri ArcGIS JS API -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.26/"></script>
+    <!-- Custom Styles -->
+    <style>
+        /* Reset margins and paddings */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        header {
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+        }
+
+        #viewDiv {
+            height: calc(100% - 50px); /* Leaves space for the header */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Public Art Mapper</h1>
+    </header>
+    <div id="viewDiv"></div>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Editor",
+            "esri/widgets/Search",
+            "esri/identity/IdentityManager"
+        ], function (Map, MapView, FeatureLayer, Editor, Search, IdentityManager) {
+
+            // Step 1: Set up API Key
+            const apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ"; // 
+            IdentityManager.registerAPIKey(apiKey);
+
+            // Step 2: Create the map
+            const map = new Map({
+                basemap: "streets-vector" // Use a visually appealing basemap
+            });
+
+            // Step 3: Set up the view
+            const view = new MapView({
+                container: "viewDiv", // Reference to the div in index.html
+                map: map,
+                center: [-98.5795, 39.8283], // Centered on the US
+                zoom: 4
+            });
+
+            // Step 4: Add a Feature Layer for public art (replace URL with your own)
+            const publicArtLayer = new FeatureLayer({
+                url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // ArcGIS Online Feature Service
+                outFields: ["*"], // Fetch all fields for display
+                popupTemplate: {
+                    title: "{Title}", // Use field names for dynamic titles
+                    content: "<p>{Description}</p><img src='{Photo_URL}' alt='Art Photo' width='200'>"
+                }
+            });
+            map.add(publicArtLayer);
+
+            // Step 5: Add the Editor Widget for user submissions
+            const editor = new Editor({
+                view: view,
+                layerInfos: [{
+                    layer: publicArtLayer,
+                    fieldConfig: [
+                        {
+                            name: "Title",
+                            label: "Art Title",
+                            required: true
+                        },
+                        {
+                            name: "Description",
+                            label: "Description",
+                            required: true
+                        },
+                        {
+                            name: "Photo_URL",
+                            label: "Photo URL"
+                        }
+                    ]
+                }]
+            });
+            view.ui.add(editor, "top-right");
+
+            // Step 6: Add a Search Widget for ease of navigation
+            const search = new Search({
+                view: view
+            });
+            view.ui.add(search, "top-left");
+
+        });
+    </script>
+</body>
+</html>
