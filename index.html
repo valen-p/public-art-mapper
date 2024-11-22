@@ -25,6 +25,7 @@
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, opacity 0.3s ease;
+            padding-top: 30px; /* Add space at the top for the button */
         }
 
         .infoBox h1 {
@@ -55,8 +56,8 @@
 
         .toggleBtn {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 10px; /* Position the button at the top of the info box */
+            right: 10px;
             background: #ffffff;
             color: #c99000;
             border: none;
@@ -68,6 +69,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 20; /* Make sure the button is above the infoBox */
         }
 
         .toggleBtn:hover {
