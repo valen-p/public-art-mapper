@@ -230,12 +230,12 @@
 
                                 // Add offset to move the popup to the right
                                 const offsetX = 20;
-                                popupContainer.style.left = ${popupPosition.x + offsetX}px;
+                                popupContainer.style.left = `${popupPosition.x + offsetX}px`;
 
                                 // Adjust the Y position based on the popup height
                                 const popupHeight = popupContainer.offsetHeight;
                                 const offsetY = (popupHeight < 600) ? 20 : -20;  // Increase height check limit
-                                popupContainer.style.top = ${popupPosition.y + offsetY}px;
+                                popupContainer.style.top = `${popupPosition.y + offsetY}px`;
                             }
                         });
                     });
