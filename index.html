@@ -12,6 +12,17 @@
             width: 100%;
         }
 
+        /* Add a header with a thin height and the color c99000 */
+        header {
+            background-color: #c99000;
+            color: white;
+            text-align: center;
+            padding: 10px 0;  /* Thin header with 10px padding */
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
         .infoBox {
             position: absolute;
             z-index: 10;
@@ -234,6 +245,11 @@
     </script>
 </head>
 <body>
+    <!-- Header Section -->
+    <header>
+        Public Art Mapper
+    </header>
+
     <div id="viewDiv"></div>
     <div class="infoBox">
         <h1>Public Art Mapper</h1>
