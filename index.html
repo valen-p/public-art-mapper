@@ -12,23 +12,85 @@
             width: 100%;
         }
 
-        /* Custom Popup styling */
-        .esri-popup {
-            width: 500px !important; /* Fixed width for the popup */
-            max-width: 90%; /* Ensure it does not overflow */
-            height: auto !important; /* Auto height adjustment based on content */
-            overflow: hidden !important; /* Prevent scrolling */
+        .infoBox {
+            position: absolute;
+            z-index: 10;
+            top: 10px;
+            right: 10px;
+            background-color: #c99000;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            width: 250px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .esri-popup__main-container {
-            max-height: none !important; /* Remove max-height restriction */
+        .infoBox h1 {
+            font-size: 18px;
+            margin: 0 0 8px;
         }
 
+        .infoBox p {
+            font-size: 14px;
+            margin: 0 0 12px;
+        }
+
+        .addRecordBtn {
+            display: inline-block;
+            background-color: #0079c1;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .addRecordBtn:hover {
+            background-color: #005a87;
+        }
+
+        .toggleBtn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ffffff;
+            color: #c99000;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggleBtn:hover {
+            background: #f5f5f5;
+        }
+
+        /* Hidden state for the info box */
+        .infoBox.hidden {
+            transform: scale(0.1);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Custom styling for images */
         .popup-image {
             max-width: 100%;
+            max-height: 400px;
+            width: auto;
             height: auto;
+            margin-bottom: 10px;
             display: block;
-            margin: 0 auto 10px auto; /* Center image */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .popup-text {
@@ -40,25 +102,33 @@
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const infoBox = document.querySelector(".infoBox");
+            const toggleBtn = document.querySelector(".toggleBtn");
+
+            toggleBtn.addEventListener("click", () => {
+                infoBox.classList.toggle("hidden");
+                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
+            });
+
             require([
-                "esri/config", 
-                "esri/Map", 
-                "esri/views/MapView", 
-                "esri/widgets/Locate", 
-                "esri/widgets/Search", 
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/widgets/Locate",
+                "esri/widgets/Search",
                 "esri/layers/FeatureLayer"
             ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-                esriConfig.apiKey = "YOUR_API_KEY";
+                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
                 const map = new Map({
-                    basemap: "streets-night-vector" 
+                    basemap: "streets-night-vector"
                 });
 
                 const view = new MapView({
-                    container: "viewDiv", 
-                    map: map, 
-                    center: [-82.3248, 29.6516], 
-                    zoom: 12 
+                    container: "viewDiv",
+                    map: map,
+                    center: [-82.3248, 29.6516],
+                    zoom: 12
                 });
 
                 view.when(() => {
@@ -109,7 +179,7 @@
                                     displayType: "image",
                                     attachmentInfos: {
                                         image: {
-                                            size: 400
+                                            size: 300
                                         }
                                     }
                                 }
@@ -121,21 +191,42 @@
 
                     // Manually position the popup to the right of the clicked point
                     layer.on("click", function(event) {
-                        const graphic = event.graphic;
-                        const popup = view.popup;
+                        const screenPoint = {
+                            x: event.x,
+                            y: event.y
+                        };
 
-                        if (graphic) {
-                            popup.open({
-                                location: event.mapPoint,
-                                title: graphic.attributes["give_me_it_a_name"],
-                                content: graphic,
-                                // Set popup width to accommodate large images
-                                width: 500,  // Fixed width for the popup
-                                height: 'auto', // Dynamically adjust the height based on content
-                                // Custom positioning logic to place the popup to the right
-                                anchor: "right" // This opens the popup to the right
-                            });
-                        }
+                        view.hitTest(screenPoint).then(function(response) {
+                            const graphic = response.results[0]?.graphic;
+                            if (graphic) {
+                                const popup = view.popup;
+                                popup.open({
+                                    location: event.mapPoint,
+                                    title: graphic.attributes["give_me_it_a_name"],
+                                    content: graphic,
+                                    // Increase the width of the popup to fit the image
+                                    width: 600,  // Increased width for larger content
+                                    height: 'auto', // Automatically adjust height
+                                    // Custom positioning logic to place the popup to the right
+                                    anchor: "right"
+                                });
+
+                                // Adjust popup location
+                                const popupContainer = popup.domNode;
+                                const popupContent = popupContainer.querySelector('.esri-popup__main-container');
+                                const popupPosition = event.mapPoint;
+                                const popupWidth = popupContainer.offsetWidth;
+
+                                // Add an offset to the right for better placement
+                                const offsetX = 20;
+                                popupContainer.style.left = `${popupPosition.x + offsetX}px`;
+
+                                // Update position dynamically if necessary
+                                const popupHeight = popupContainer.offsetHeight;
+                                const offsetY = (popupHeight < 500) ? 20 : -20;
+                                popupContainer.style.top = `${popupPosition.y + offsetY}px`;
+                            }
+                        });
                     });
                 });
             });
@@ -144,5 +235,12 @@
 </head>
 <body>
     <div id="viewDiv"></div>
+    <div class="infoBox">
+        <h1>Public Art Mapper</h1>
+        <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
+        <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+        <p>Check out what others have found by clicking the red points on the map :)</p>
+    </div>
+    <button class="toggleBtn">-</button>
 </body>
 </html>
