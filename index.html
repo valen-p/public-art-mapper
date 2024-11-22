@@ -12,36 +12,28 @@
             width: 100%;
         }
 
-        /* Popup styling */
+        /* Custom Popup styling */
         .esri-popup {
-            width: 500px !important; /* Increased width of the popup */
-            max-width: 500px; /* Set maximum width */
-            max-height: none !important; /* Allow height to adjust automatically */
-            height: auto !important;
-            overflow: hidden !important; /* No scrolling */
+            width: 500px !important; /* Fixed width for the popup */
+            max-width: 90%; /* Ensure it does not overflow */
+            height: auto !important; /* Auto height adjustment based on content */
+            overflow: hidden !important; /* Prevent scrolling */
         }
 
         .esri-popup__main-container {
-            max-height: none !important;
-        }
-
-        .esri-popup__content {
-            font-size: 14px;
-            line-height: 1.4;
+            max-height: none !important; /* Remove max-height restriction */
         }
 
         .popup-image {
             max-width: 100%;
             height: auto;
-            margin-bottom: 10px;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto 10px auto; /* Center image */
         }
 
         .popup-text {
-            white-space: pre-wrap; /* Preserve text formatting */
-            overflow-wrap: break-word; /* Prevent long words from overflowing */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
         }
     </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
@@ -49,24 +41,24 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             require([
-                "esri/config",
-                "esri/Map",
-                "esri/views/MapView",
-                "esri/widgets/Locate",
-                "esri/widgets/Search",
+                "esri/config", 
+                "esri/Map", 
+                "esri/views/MapView", 
+                "esri/widgets/Locate", 
+                "esri/widgets/Search", 
                 "esri/layers/FeatureLayer"
             ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+                esriConfig.apiKey = "YOUR_API_KEY";
 
                 const map = new Map({
-                    basemap: "streets-night-vector"
+                    basemap: "streets-night-vector" 
                 });
 
                 const view = new MapView({
-                    container: "viewDiv",
-                    map: map,
-                    center: [-82.3248, 29.6516], // Use your center coordinates
-                    zoom: 12
+                    container: "viewDiv", 
+                    map: map, 
+                    center: [-82.3248, 29.6516], 
+                    zoom: 12 
                 });
 
                 view.when(() => {
@@ -117,7 +109,7 @@
                                     displayType: "image",
                                     attachmentInfos: {
                                         image: {
-                                            size: 300
+                                            size: 400
                                         }
                                     }
                                 }
@@ -129,43 +121,21 @@
 
                     // Manually position the popup to the right of the clicked point
                     layer.on("click", function(event) {
-                        const screenPoint = {
-                            x: event.x,
-                            y: event.y
-                        };
+                        const graphic = event.graphic;
+                        const popup = view.popup;
 
-                        view.hitTest(screenPoint).then(function(response) {
-                            const graphic = response.results[0]?.graphic;
-                            if (graphic) {
-                                const popup = view.popup;
-                                const offset = 10; // Offset for the popup
-
-                                popup.open({
-                                    location: event.mapPoint,
-                                    title: graphic.attributes["give_me_it_a_name"],
-                                    content: graphic,
-                                    // Increase the width of the popup
-                                    width: 500,  // Fixed width for the popup
-                                    height: 'auto', // Auto height based on content
-                                    // Move the popup to the right of the clicked point
-                                    anchor: "right" // This ensures the popup opens to the right of the point
-                                });
-                                
-                                // Get the position of the popup and adjust it manually
-                                const popupContainer = popup.domNode;
-                                const popupContent = popupContainer.querySelector('.esri-popup__main-container');
-                                
-                                // Get the map coordinates of the clicked point
-                                const popupPosition = event.mapPoint;
-                                
-                                // Adjust the position of the popup to be to the right of the clicked point
-                                const popupWidth = popupContainer.offsetWidth;
-                                const adjustedX = popupPosition.x + offset;
-                                
-                                // Apply the position of the popup to the right
-                                popupContainer.style.left = `${adjustedX}px`;
-                            }
-                        });
+                        if (graphic) {
+                            popup.open({
+                                location: event.mapPoint,
+                                title: graphic.attributes["give_me_it_a_name"],
+                                content: graphic,
+                                // Set popup width to accommodate large images
+                                width: 500,  // Fixed width for the popup
+                                height: 'auto', // Dynamically adjust the height based on content
+                                // Custom positioning logic to place the popup to the right
+                                anchor: "right" // This opens the popup to the right
+                            });
+                        }
                     });
                 });
             });
