@@ -1,1 +1,1 @@
-# public-art-mapper
+# public-art-project
