@@ -29,6 +29,11 @@
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
+        .infoBox.minimized {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
         .infoBox h1 {
             font-size: 18px;
             margin: 0 0 8px;
@@ -80,19 +85,13 @@
             background: #f5f5f5;
         }
 
-        .infoBox.minimized {
-            transform: scale(0.1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
     </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const infoBox = document.getElementById("infoBox");
+        document.addEventListener("DOMContentLoaded", function() {
             const minimizeBtn = document.getElementById("minimizeBtn");
+            const infoBox = document.getElementById("infoBox");
 
             minimizeBtn.addEventListener("click", () => {
                 // Toggle the 'minimized' class
@@ -120,43 +119,27 @@
                     zoom: 12 
                 });
 
-                view.when(() => {
-                    console.log("MapView is loaded");
-
-                    const locateBtn = new Locate({
-                        view: view
-                    });
-
-                    view.ui.add(locateBtn, {
-                        position: "top-left"
-                    });
-
-                    const searchWidget = new Search({
-                        view: view
-                    });
-
-                    view.ui.add(searchWidget, {
-                        position: "top-left"
-                    });
-
-                    const layer = new FeatureLayer({
-                        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                        popupTemplate: {
-                            title: "{give_me_it_a_name}", 
-                            content: [
-                                {
-                                    type: "fields",
-                                    fieldInfos: [] 
-                                },
-                                {
-                                    type: "attachments"
-                                }
-                            ]
-                        }
-                    });
-
-                    map.add(layer);
+                const locateWidget = new Locate({
+                    view: view
                 });
+                view.ui.add(locateWidget, "top-left");
+
+                const searchWidget = new Search({
+                    view: view
+                });
+                view.ui.add(searchWidget, "top-left");
+
+                const featureLayer = new FeatureLayer({
+                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer",
+                    popupTemplate: {
+                        title: "{Title}",
+                        content: `
+                            <p><strong>Description:</strong> {Description}</p>
+                            <img src="{ImageURL}" alt="{Title}" style="max-width:100%; border-radius:4px;">
+                        `
+                    }
+                });
+                map.add(featureLayer);
             });
         });
     </script>
