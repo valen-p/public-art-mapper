@@ -239,17 +239,20 @@
                             }
                         });
                     });
+
+                    // Close popup handler that will not affect other UI elements
+                    view.popup.on("close", () => {
+                        // Ensure that the info box and header remain visible when the popup is closed
+                        infoBox.classList.remove("hidden");
+                        toggleBtn.textContent = "-";
+                    });
                 });
             });
         });
     </script>
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        Public Art Mapper
-    </header>
-
+    <header>Public Art Mapper</header>
     <div id="viewDiv"></div>
     <div class="infoBox">
         <h1>Public Art Mapper</h1>
