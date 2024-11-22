@@ -89,15 +89,13 @@
 
         /* Custom popup styling */
         .esri-popup {
-            max-width: 400px !important; /* Increased max width */
-            max-height: 600px !important; /* Increased max height */
-            height: auto !important;  /* Make it auto-adjust based on content */
-            overflow-y: auto !important;  /* Allow scrolling only if needed */
+            max-width: 500px !important; /* Set max width */
+            height: auto !important; /* Auto height adjustment */
+            overflow: hidden !important; /* Prevent scrolling */
         }
 
         .esri-popup__main-container {
-            overflow-y: auto !important; /* Allow scrolling */
-            max-height: 600px;  /* Set max height */
+            max-height: none !important; /* Remove max-height restriction */
         }
 
         .esri-popup__content {
@@ -228,9 +226,10 @@
                                     location: event.mapPoint,
                                     title: graphic.attributes["give_me_it_a_name"],
                                     content: graphic,
-                                    // Ensure popup auto adjusts for vertical images
-                                    width: 400,
-                                    height: 'auto', // Allow dynamic height adjustment
+                                    // Set the popup to appear to the right
+                                    width: 500,  // Fixed width for the popup
+                                    height: 'auto', // Adjust height to fit content
+                                    anchor: "right"  // Popup opens to the right
                                 });
                             }
                         });
