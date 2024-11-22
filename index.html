@@ -25,7 +25,6 @@
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, opacity 0.3s ease;
-            padding-top: 30px; /* Add space at the top for the button */
         }
 
         .infoBox h1 {
@@ -56,8 +55,8 @@
 
         .toggleBtn {
             position: absolute;
-            top: 10px; /* Position the button at the top of the info box */
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: #ffffff;
             color: #c99000;
             border: none;
@@ -69,7 +68,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            z-index: 20; /* Make sure the button is above the infoBox */
         }
 
         .toggleBtn:hover {
@@ -86,8 +84,8 @@
         /* Custom styling for images */
         .popup-image {
             max-width: 100%;
-            max-height: 80vh; /* Set max height to 80% of viewport height */
-            height: auto; /* Allow height to adjust automatically based on aspect ratio */
+            max-height: 80vh;
+            height: auto;
             width: auto;
             margin-bottom: 10px;
             display: block;
@@ -118,9 +116,10 @@
                 "esri/views/MapView",
                 "esri/widgets/Locate",
                 "esri/widgets/Search",
-                "esri/layers/FeatureLayer"
-            ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+                "esri/layers/FeatureLayer",
+                "esri/tasks/Locator"
+            ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer, Locator) => {
+                esriConfig.apiKey = "YOUR_API_KEY"; // Replace with your API key
 
                 const map = new Map({
                     basemap: "streets-night-vector"
@@ -131,6 +130,10 @@
                     map: map,
                     center: [-82.3248, 29.6516],
                     zoom: 12
+                });
+
+                const locator = new Locator({
+                    url: "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer"
                 });
 
                 view.when(() => {
@@ -173,21 +176,6 @@
                                             fieldName: "Location",
                                             label: "Location",
                                             visible: true
-                                        },
-                                        {
-                                            fieldName: "City",
-                                            label: "City",
-                                            visible: true
-                                        },
-                                        {
-                                            fieldName: "State",
-                                            label: "State",
-                                            visible: true
-                                        },
-                                        {
-                                            fieldName: "Country",
-                                            label: "Country",
-                                            visible: true
                                         }
                                     ]
                                 },
@@ -208,38 +196,46 @@
 
                     // Manually position the popup to the right of the clicked point
                     layer.on("click", function(event) {
-                        const screenPoint = {
-                            x: event.x,
-                            y: event.y
-                        };
+                        const clickedPoint = event.mapPoint;
 
-                        view.hitTest(screenPoint).then(function(response) {
-                            const graphic = response.results[0]?.graphic;
-                            if (graphic) {
-                                const popup = view.popup;
-                                popup.open({
-                                    location: event.mapPoint,
-                                    title: graphic.attributes["give_me_it_a_name"],
-                                    content: graphic,
-                                    // Increase the width of the popup to fit the image
-                                    width: 600,  // Increased width for larger content
-                                    height: 'auto', // Automatically adjust height
-                                });
+                        // Use reverse geocoding to get city, state, and country based on the map point's coordinates
+                        locator.locationToAddress(clickedPoint).then(function(response) {
+                            const address = response.address;
+                            const city = address.City || "Unknown City";
+                            const state = address.Region || "Unknown State";
+                            const country = address.CountryCode || "Unknown Country";
 
-                                // Adjust popup location to the right of the clicked point
-                                const popupContainer = popup.domNode;
-                                const popupPosition = event.mapPoint;
-                                const popupWidth = popupContainer.offsetWidth;
+                            // Open popup and display city, state, country
+                            const popup = view.popup;
+                            popup.open({
+                                location: clickedPoint,
+                                title: "Public Art Location",
+                                content: `
+                                    <b>City:</b> ${city}<br>
+                                    <b>State:</b> ${state}<br>
+                                    <b>Country:</b> ${country}<br>
+                                    <b>Description:</b> ${event.graphic.attributes.Description || "No description available."}
+                                `,
+                                width: 600,  // Increased width for larger content
+                                height: 'auto', // Automatically adjust height
+                            });
 
-                                // Add offset to move the popup to the right
-                                const offsetX = 20;
-                                popupContainer.style.left = `${popupPosition.x + offsetX}px`;
-
-                                // Adjust the Y position based on the popup height
-                                const popupHeight = popupContainer.offsetHeight;
-                                const offsetY = (popupHeight < 600) ? 20 : -20;  // Increase height check limit
-                                popupContainer.style.top = `${popupPosition.y + offsetY}px`;
-                            }
+                        }).catch(function(error) {
+                            console.error("Geocoding error: ", error);
+                            // Fallback if geocoding fails
+                            const popup = view.popup;
+                            popup.open({
+                                location: clickedPoint,
+                                title: "Public Art Location",
+                                content: `
+                                    <b>City:</b> Unknown City<br>
+                                    <b>State:</b> Unknown State<br>
+                                    <b>Country:</b> Unknown Country<br>
+                                    <b>Description:</b> ${event.graphic.attributes.Description || "No description available."}
+                                `,
+                                width: 600,
+                                height: 'auto',
+                            });
                         });
                     });
                 });
