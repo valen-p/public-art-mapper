@@ -1,4 +1,4 @@
-# public-art-project
+# Public Art Project
 
 🚀 Project Overview
 Public Art Mapper is an interactive web application designed to help users discover and share public art. Using the ArcGIS API, users can explore a dynamic map, locate public art, and contribute their findings to a shared database.
