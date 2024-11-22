@@ -242,9 +242,9 @@
 
                     // Ensure the header and infoBox are unaffected when the popup is closed
                     view.popup.on("close", () => {
-                        // Do not touch the visibility of the header and infoBox here
-                        // Ensure these elements stay visible
-                        infoBox.classList.remove("hidden");
+                        // Ensure these elements stay visible even when the popup closes
+                        document.querySelector("header").style.visibility = "visible";
+                        infoBox.style.visibility = "visible";
                     });
                 });
             });
@@ -263,4 +263,3 @@
     <button class="toggleBtn">-</button>
 </body>
 </html>
-
