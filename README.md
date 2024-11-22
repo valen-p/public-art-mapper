@@ -10,7 +10,8 @@ Add your own findings of public art through an intuitive interface.
 Interactive search and locate functionality for easy navigation.
 Popup details with images and descriptions for each art location.
 
-🌟 Features
+🌟 Features: 
+
 Interactive Map
 View public art data points on an interactive map with details displayed in custom popups.
 
