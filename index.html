@@ -86,10 +86,10 @@
         /* Custom styling for images */
         .popup-image {
             max-width: 100%;
-            max-height: 700px; /* Increase max height for larger images */
+            max-height: 80vh; /* Set max height to 80% of viewport height */
+            height: auto; /* Allow height to adjust automatically based on aspect ratio */
             width: auto;
-            height: auto;
-            margin-bottom: 90px;
+            margin-bottom: 10px;
             display: block;
             margin-left: auto;
             margin-right: auto;
@@ -222,7 +222,7 @@
 
                                 // Adjust the Y position based on the popup height
                                 const popupHeight = popupContainer.offsetHeight;
-                                const offsetY = (popupHeight < 500) ? 20 : -20;
+                                const offsetY = (popupHeight < 600) ? 20 : -20;  // Increase height check limit
                                 popupContainer.style.top = `${popupPosition.y + offsetY}px`;
                             }
                         });
