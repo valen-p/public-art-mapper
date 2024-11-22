@@ -12,80 +12,26 @@
             width: 100%;
         }
 
-        .infoBox {
-            position: absolute;
-            z-index: 10;
-            top: 10px;
-            right: 10px;
-            background-color: #c99000;
-            color: white;
-            padding: 16px;
-            border-radius: 8px;
-            width: 250px;
-            font-family: Arial, sans-serif;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, opacity 0.3s ease;
+        /* Popup styling */
+        .esri-popup {
+            width: 500px !important; /* Increased width of the popup */
+            max-width: 500px; /* Set maximum width */
+            max-height: none !important; /* Allow height to adjust automatically */
+            height: auto !important;
+            overflow: hidden !important; /* No scrolling */
         }
 
-        .infoBox h1 {
-            font-size: 18px;
-            margin: 0 0 8px;
+        .esri-popup__main-container {
+            max-height: none !important;
         }
 
-        .infoBox p {
+        .esri-popup__content {
             font-size: 14px;
-            margin: 0 0 12px;
+            line-height: 1.4;
         }
 
-        .addRecordBtn {
-            display: inline-block;
-            background-color: #0079c1;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .addRecordBtn:hover {
-            background-color: #005a87;
-        }
-
-        .toggleBtn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #ffffff;
-            color: #c99000;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            padding: 4px 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggleBtn:hover {
-            background: #f5f5f5;
-        }
-
-        /* Hidden state for the info box */
-        .infoBox.hidden {
-            transform: scale(0.1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Custom styling for images */
         .popup-image {
             max-width: 100%;
-            max-height: 400px;
-            width: auto;
             height: auto;
             margin-bottom: 10px;
             display: block;
@@ -94,22 +40,14 @@
         }
 
         .popup-text {
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
+            white-space: pre-wrap; /* Preserve text formatting */
+            overflow-wrap: break-word; /* Prevent long words from overflowing */
         }
     </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const infoBox = document.querySelector(".infoBox");
-            const toggleBtn = document.querySelector(".toggleBtn");
-
-            toggleBtn.addEventListener("click", () => {
-                infoBox.classList.toggle("hidden");
-                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
-            });
-
             require([
                 "esri/config",
                 "esri/Map",
@@ -127,7 +65,7 @@
                 const view = new MapView({
                     container: "viewDiv",
                     map: map,
-                    center: [-82.3248, 29.6516],
+                    center: [-82.3248, 29.6516], // Use your center coordinates
                     zoom: 12
                 });
 
@@ -200,28 +138,32 @@
                             const graphic = response.results[0]?.graphic;
                             if (graphic) {
                                 const popup = view.popup;
+                                const offset = 10; // Offset for the popup
+
                                 popup.open({
                                     location: event.mapPoint,
                                     title: graphic.attributes["give_me_it_a_name"],
                                     content: graphic,
-                                    // Set the popup to appear to the right of the point
+                                    // Increase the width of the popup
                                     width: 500,  // Fixed width for the popup
-                                    height: 'auto', // Dynamically adjust the height based on content
-                                    // Custom positioning logic to place the popup to the right
-                                    pocket: "right",  // Ensures the popup opens right of the point
-                                    // Custom logic to handle positioning
-                                    anchor: "right"
+                                    height: 'auto', // Auto height based on content
+                                    // Move the popup to the right of the clicked point
+                                    anchor: "right" // This ensures the popup opens to the right of the point
                                 });
-
-                                // Move the popup to the right of the clicked point
+                                
+                                // Get the position of the popup and adjust it manually
                                 const popupContainer = popup.domNode;
                                 const popupContent = popupContainer.querySelector('.esri-popup__main-container');
-                                const popupPosition = event.mapPoint;
-                                const popupWidth = popupContainer.offsetWidth;
                                 
-                                // Adjust the left position of the popup
-                                const offsetX = 20; // Add some margin to the left
-                                popupContainer.style.left = `${popupPosition.x + offsetX}px`;
+                                // Get the map coordinates of the clicked point
+                                const popupPosition = event.mapPoint;
+                                
+                                // Adjust the position of the popup to be to the right of the clicked point
+                                const popupWidth = popupContainer.offsetWidth;
+                                const adjustedX = popupPosition.x + offset;
+                                
+                                // Apply the position of the popup to the right
+                                popupContainer.style.left = `${adjustedX}px`;
                             }
                         });
                     });
@@ -232,12 +174,5 @@
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="infoBox">
-        <h1>Public Art Mapper</h1>
-        <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
-        <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
-        <p>Check out what others have found by clicking the red points on the map :)</p>
-    </div>
-    <button class="toggleBtn">-</button>
 </body>
 </html>
