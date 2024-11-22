@@ -194,7 +194,11 @@
             // Function to minimize/maximize the info box
             function toggleInfoBox() {
                 const infoBox = document.querySelector(".infoBox");
-                infoBox.classList.toggle("minimized");
+                if (infoBox.classList.contains("minimized")) {
+                    infoBox.classList.remove("minimized");
+                } else {
+                    infoBox.classList.add("minimized");
+                }
             }
             
             // Add event listener for minimize button
