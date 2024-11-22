@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Public Art Mapper</title>
     <style>
-        /* General styling for the page */
+        /* General layout for the page to ensure the map and elements take up the full screen */
         html, body, #viewDiv {
             padding: 0;
             margin: 0;
@@ -13,115 +13,107 @@
             width: 100%;
         }
 
-        /* Header styling */
+        /* Header styling for the top banner with project name */
         header {
-            background-color: #c99000; 
-            color: white; 
+            background-color: #c99000;
+            color: white;
             text-align: center;
-            padding: 10px 0; 
+            padding: 10px 0;
             font-family: Arial, sans-serif;
-            font-size: 18px; 
+            font-size: 18px;
             font-weight: bold;
         }
 
-        /* Info box styling */
+        /* Info box for displaying project details, with a focus on positioning and styling */
         .infoBox {
-            position: absolute; /* Position the box on the page */
-            z-index: 10; 
-            top: 10px; /* Distance from the top of the page */
-            right: 10px; 
-            background-color: #c99000; 
+            position: absolute;
+            z-index: 10;
+            top: 10px;
+            right: 10px;
+            background-color: #c99000;
             color: white;
-            padding: 16px; 
-            border-radius: 8px; 
-            width: 250px; 
-            font-family: Arial, sans-serif; 
+            padding: 16px;
+            border-radius: 8px;
+            width: 250px;
+            font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, opacity 0.3s ease; 
-            padding-top: 30px; 
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            padding-top: 30px; /* Ensures space for toggle button */
         }
 
-        /* Info box header styling */
+        /* Styling for the header and paragraph content within the info box */
         .infoBox h1 {
-            font-size: 18px; 
-            margin: 0 0 8px; 
+            font-size: 18px;
+            margin: 0 0 8px;
         }
-
-        /* Info box paragraph styling */
         .infoBox p {
-            font-size: 14px; 
-            margin: 0 0 12px; 
+            font-size: 14px;
+            margin: 0 0 12px;
         }
 
-        /* Add Public Art button styling */
+        /* Button inside the info box to add a new public art record */
         .addRecordBtn {
-            display: inline-block; /* Inline block for button styling */
-            background-color: #0079c1; 
-            color: white; 
-            padding: 8px 16px; 
+            display: inline-block;
+            background-color: #0079c1;
+            color: white;
+            padding: 8px 16px;
             border: none;
-            border-radius: 4px; 
-            font-size: 14px; 
+            border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
-            text-decoration: none; 
-            margin-bottom: 20px; /* Space below button */
+            text-decoration: none;
+            margin-bottom: 20px;
         }
-
-        /* Hover effect for Add Public Art button */
         .addRecordBtn:hover {
-            background-color: #005a87; /* Darker blue on hover */
+            background-color: #005a87;
         }
 
-        /* Toggle button styling */
+        /* Toggle button styling to show or hide the info box */
         .toggleBtn {
-            position: absolute; /* Position relative to the page */
-            top: 10px; 
-            right: 10px; 
-            background: #ffffff; 
-            color: #c99000; 
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ffffff;
+            color: #c99000;
             border: none;
-            border-radius: 4px; /* Rounded corners */
-            font-size: 14px; 
-            padding: 4px 8px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-            z-index: 20; /* Ensure button is above the infoBox */
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 20;
         }
-
-        /* Hover effect for toggle button */
         .toggleBtn:hover {
-            background: #f5f5f5; 
+            background: #f5f5f5;
         }
 
-        /* Hidden state for the info box */
+        /* Transitions for hiding the info box */
         .infoBox.hidden {
-            transform: scale(0.1); /* Shrink the box */
-            opacity: 0; /* Make it invisible */
-            pointer-events: none; 
+            transform: scale(0.1);
+            opacity: 0;
+            pointer-events: none;
         }
 
-        /* Custom styling for popup images */
+        /* Styling for popup images within the map popups */
         .popup-image {
-            max-width: 100%; /* Fit image within container */
-            max-height: 80vh; /* Limit height to 80% of viewport */
-            height: auto; 
-            width: auto; 
-            margin-bottom: 10px; 
-            display: block; 
-            margin-left: auto; 
-            margin-right: auto; 
+            max-width: 100%;
+            max-height: 80vh;
+            height: auto;
+            width: auto;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
-
-        /* Custom styling for popup text */
         .popup-text {
-            white-space: pre-wrap; /* Preserve whitespace */
-            overflow-wrap: break-word; /* Break long words */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
         }
     </style>
-    <!-- Link to ArcGIS styles and scripts -->
+    <!-- Include ArcGIS API styles and scripts -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
@@ -129,13 +121,13 @@
             const infoBox = document.querySelector(".infoBox");
             const toggleBtn = document.querySelector(".toggleBtn");
 
-            // Toggle the visibility of the infoBox when button is clicked
+            // Toggle visibility of the info box when the button is clicked
             toggleBtn.addEventListener("click", () => {
-                infoBox.classList.toggle("hidden"); // Toggle hidden class
-                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-"; // Update button text
+                infoBox.classList.toggle("hidden");
+                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
             });
 
-            // Load required ArcGIS modules
+            // Initialize the ArcGIS map and its widgets
             require([
                 "esri/config",
                 "esri/Map",
@@ -144,61 +136,61 @@
                 "esri/widgets/Search",
                 "esri/layers/FeatureLayer"
             ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+                esriConfig.apiKey = "YOUR_API_KEY"; // Replace with your API key
 
+                // Create the map with a dark basemap
                 const map = new Map({
-                    basemap: "streets-night-vector" // Basemap style
+                    basemap: "streets-night-vector"
                 });
 
+                // Set up the map view with initial coordinates and zoom level
                 const view = new MapView({
-                    container: "viewDiv", // Div container for the map
+                    container: "viewDiv",
                     map: map,
-                    center: [-82.3248, 29.6516], // Map center in Gainesville, FL
-                    zoom: 12 // Initial zoom level
+                    center: [-82.3248, 29.6516], // Gainesville, FL coordinates
+                    zoom: 12
                 });
 
                 view.when(() => {
                     console.log("MapView is loaded");
 
-                    // Add Locate button to find user's location
+                    // Add a "Locate" widget to find the user's location
                     const locateBtn = new Locate({
                         view: view
                     });
+                    view.ui.add(locateBtn, { position: "top-left" });
 
-                    view.ui.add(locateBtn, {
-                        position: "top-left" // Position locate button
-                    });
-
-                    // Add Search widget for finding locations
+                    // Add a "Search" widget to allow users to find places
                     const searchWidget = new Search({
                         view: view
                     });
+                    view.ui.add(searchWidget, { position: "top-left" });
 
-                    view.ui.add(searchWidget, {
-                        position: "top-left" // Position search widget
-                    });
-
-                    // Feature layer with art data
+                    // Load and display the public art data from a feature layer
                     const layer = new FeatureLayer({
-                        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Public_Art/FeatureServer", // Feature service URL
-                        popupTemplate: { // Popup template for displaying art details
-                            title: "{give_me_it_a_name}",
+                        url: "YOUR_FEATURE_LAYER_URL", // Replace with your feature service URL
+                        popupTemplate: { // Define the popup template for displayed features
+                            title: "{give_me_it_a_name}", // Display field for title
                             content: [
                                 {
-                                    type: "fields",
+                                    type: "fields", // Display fields in the popup
                                     fieldInfos: [
                                         { fieldName: "Description", label: "Description", visible: true },
                                         { fieldName: "Location", label: "Location", visible: true }
                                     ]
                                 },
-                                { type: "attachments", displayType: "image", attachmentInfos: { image: { size: 300 } } }
+                                {
+                                    type: "attachments", // Show image attachments
+                                    displayType: "image",
+                                    attachmentInfos: { image: { size: 300 } }
+                                }
                             ]
                         }
                     });
 
-                    map.add(layer); // Add layer to the map
+                    map.add(layer); // Add the feature layer to the map
 
-                    // Ensure UI elements are visible when popup closes
+                    // Ensure header and infoBox remain visible when the popup closes
                     view.popup.on("close", () => {
                         document.querySelector("header").style.visibility = "visible";
                         infoBox.style.visibility = "visible";
@@ -209,18 +201,21 @@
     </script>
 </head>
 <body>
-    <!-- Static header -->
+    <!-- Header for the application -->
     <header>Public Art Project</header>
-    <!-- Map container -->
+
+    <!-- Div where the map will be rendered -->
     <div id="viewDiv"></div>
-    <!-- Information box -->
+
+    <!-- Info box with project details and a button to add records -->
     <div class="infoBox">
         <h1>Public Art Project</h1>
         <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
         <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
         <p>Check out what others have found by clicking the red points on the map :)</p>
     </div>
-    <!-- Button to toggle info box -->
+
+    <!-- Button to toggle the visibility of the info box -->
     <button class="toggleBtn">-</button>
 </body>
 </html>
