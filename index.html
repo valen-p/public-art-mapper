@@ -90,7 +90,8 @@
         /* Custom popup styling */
         .esri-popup {
             max-width: 400px !important; /* Increased max width */
-            max-height: 400px !important; /* Increased max height */
+            max-height: 600px !important; /* Increased max height */
+            height: auto !important;  /* Make it auto-adjust based on content */
         }
 
         .esri-popup__main-container {
@@ -102,10 +103,12 @@
             line-height: 1.4;
         }
 
-        /* Style long text fields or images */
+        /* Style for long text fields or images */
         .popup-image {
             max-width: 100%;
+            max-height: 400px;
             height: auto;
+            width: auto;
             margin-bottom: 10px;
         }
 
@@ -204,6 +207,29 @@
                     });
 
                     map.add(layer);
+
+                    // Adjust the popup to display the image dynamically based on its size
+                    layer.on("click", function(event) {
+                        const screenPoint = {
+                            x: event.x,
+                            y: event.y
+                        };
+
+                        view.hitTest(screenPoint).then(function(response) {
+                            const graphic = response.results[0]?.graphic;
+                            if (graphic) {
+                                const popup = view.popup;
+                                popup.open({
+                                    location: event.mapPoint,
+                                    title: graphic.attributes["give_me_it_a_name"],
+                                    content: graphic,
+                                    // Ensure popup auto adjusts for vertical images
+                                    width: 400,
+                                    height: 'auto', // Allow dynamic height adjustment
+                                });
+                            }
+                        });
+                    });
                 });
             });
         });
