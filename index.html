@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Public Art Mapper</title>
     <style>
-        html,
-        body,
-        #viewDiv {
+        html, body, #viewDiv {
             padding: 0;
             margin: 0;
             height: 100%;
@@ -37,10 +35,6 @@
         .infoBox p {
             font-size: 14px;
             margin: 0 0 12px;
-        }
-
-        .infoBox p:last-child {
-            margin-top: 20px;
         }
 
         .addRecordBtn {
@@ -87,23 +81,7 @@
             pointer-events: none;
         }
 
-        /* Custom popup styling */
-        .esri-popup {
-            max-width: 500px !important; /* Set max width */
-            height: auto !important; /* Auto height adjustment */
-            overflow: hidden !important; /* Prevent scrolling */
-        }
-
-        .esri-popup__main-container {
-            max-height: none !important; /* Remove max-height restriction */
-        }
-
-        .esri-popup__content {
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        /* Style for long text fields or images */
+        /* Custom styling for images */
         .popup-image {
             max-width: 100%;
             max-height: 400px;
@@ -116,8 +94,8 @@
         }
 
         .popup-text {
-            white-space: pre-wrap; /* Preserve text formatting */
-            overflow-wrap: break-word; /* Prevent long words from overflowing */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
         }
     </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
@@ -133,24 +111,24 @@
             });
 
             require([
-                "esri/config", 
-                "esri/Map", 
-                "esri/views/MapView", 
-                "esri/widgets/Locate", 
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/widgets/Locate",
                 "esri/widgets/Search",
                 "esri/layers/FeatureLayer"
             ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
                 esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
-                
+
                 const map = new Map({
-                    basemap: "streets-night-vector" 
+                    basemap: "streets-night-vector"
                 });
 
                 const view = new MapView({
-                    container: "viewDiv", 
-                    map: map, 
-                    center: [-82.3248, 29.6516], 
-                    zoom: 12 
+                    container: "viewDiv",
+                    map: map,
+                    center: [-82.3248, 29.6516],
+                    zoom: 12
                 });
 
                 view.when(() => {
@@ -175,7 +153,7 @@
                     const layer = new FeatureLayer({
                         url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                         popupTemplate: {
-                            title: "{give_me_it_a_name}", 
+                            title: "{give_me_it_a_name}",
                             content: [
                                 {
                                     type: "fields",
@@ -211,7 +189,7 @@
 
                     map.add(layer);
 
-                    // Adjust the popup to display the image dynamically based on its size
+                    // Manually position the popup to the right of the clicked point
                     layer.on("click", function(event) {
                         const screenPoint = {
                             x: event.x,
@@ -226,11 +204,24 @@
                                     location: event.mapPoint,
                                     title: graphic.attributes["give_me_it_a_name"],
                                     content: graphic,
-                                    // Set the popup to appear to the right
+                                    // Set the popup to appear to the right of the point
                                     width: 500,  // Fixed width for the popup
-                                    height: 'auto', // Adjust height to fit content
-                                    anchor: "right"  // Popup opens to the right
+                                    height: 'auto', // Dynamically adjust the height based on content
+                                    // Custom positioning logic to place the popup to the right
+                                    pocket: "right",  // Ensures the popup opens right of the point
+                                    // Custom logic to handle positioning
+                                    anchor: "right"
                                 });
+
+                                // Move the popup to the right of the clicked point
+                                const popupContainer = popup.domNode;
+                                const popupContent = popupContainer.querySelector('.esri-popup__main-container');
+                                const popupPosition = event.mapPoint;
+                                const popupWidth = popupContainer.offsetWidth;
+                                
+                                // Adjust the left position of the popup
+                                const offsetX = 20; // Add some margin to the left
+                                popupContainer.style.left = `${popupPosition.x + offsetX}px`;
                             }
                         });
                     });
