@@ -5,7 +5,6 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Public Art Mapper</title>
     <style>
-        /* General layout for the page to ensure the map and elements take up the full screen */
         html, body, #viewDiv {
             padding: 0;
             margin: 0;
@@ -13,18 +12,17 @@
             width: 100%;
         }
 
-        /* Header styling for the top banner with project name */
+        /* Add a header with a thin height and the color c99000 */
         header {
             background-color: #c99000;
             color: white;
             text-align: center;
-            padding: 10px 0;
+            padding: 10px 0;  /* Thin header with 10px padding */
             font-family: Arial, sans-serif;
             font-size: 18px;
             font-weight: bold;
         }
-
-        /* Info box for displaying project details, with a focus on positioning and styling */
+/* Info box styling */
         .infoBox {
             position: absolute;
             z-index: 10;
@@ -38,20 +36,19 @@
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, opacity 0.3s ease;
-            padding-top: 30px; /* Ensures space for toggle button */
+            padding-top: 30px; /* Add space at the top for the button */
         }
 
-        /* Styling for the header and paragraph content within the info box */
         .infoBox h1 {
             font-size: 18px;
             margin: 0 0 8px;
         }
+
         .infoBox p {
             font-size: 14px;
             margin: 0 0 12px;
         }
-
-        /* Button inside the info box to add a new public art record */
+  /* Add Public Art button styling */
         .addRecordBtn {
             display: inline-block;
             background-color: #0079c1;
@@ -62,16 +59,16 @@
             font-size: 14px;
             cursor: pointer;
             text-decoration: none;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Add space below the button */
         }
+
         .addRecordBtn:hover {
             background-color: #005a87;
         }
-
-        /* Toggle button styling to show or hide the info box */
+ /* Toggle button styling */
         .toggleBtn {
             position: absolute;
-            top: 10px;
+            top: 10px; /* Position the button at the top of the info box */
             right: 10px;
             background: #ffffff;
             color: #c99000;
@@ -84,50 +81,51 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            z-index: 20;
+            z-index: 20; /* Make sure the button is above the infoBox */
         }
+
         .toggleBtn:hover {
             background: #f5f5f5;
         }
 
-        /* Transitions for hiding the info box */
+        /* Hidden state for the info box */
         .infoBox.hidden {
             transform: scale(0.1);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* Styling for popup images within the map popups */
+        /* Custom styling for images */
         .popup-image {
             max-width: 100%;
-            max-height: 80vh;
-            height: auto;
+            max-height: 80vh; /* Set max height to 80% of viewport height */
+            height: auto; /* Allow height to adjust automatically based on aspect ratio */
             width: auto;
             margin-bottom: 10px;
             display: block;
             margin-left: auto;
             margin-right: auto;
         }
+ /* Custom styling for popup images */
         .popup-text {
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
     </style>
-    <!-- Include ArcGIS API styles and scripts -->
+      <!-- Link to ArcGIS styles and scripts -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
+        
         document.addEventListener("DOMContentLoaded", () => {
             const infoBox = document.querySelector(".infoBox");
             const toggleBtn = document.querySelector(".toggleBtn");
-
-            // Toggle visibility of the info box when the button is clicked
+ // Toggle the visibility of the infoBox when button is clicked
             toggleBtn.addEventListener("click", () => {
                 infoBox.classList.toggle("hidden");
                 toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
             });
-
-            // Initialize the ArcGIS map and its widgets
+// Load required ArcGIS modules
             require([
                 "esri/config",
                 "esri/Map",
@@ -136,62 +134,117 @@
                 "esri/widgets/Search",
                 "esri/layers/FeatureLayer"
             ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-                esriConfig.apiKey = "YOUR_API_KEY"; // Replace with your API key
+                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
-                // Create the map with a dark basemap
                 const map = new Map({
                     basemap: "streets-night-vector"
                 });
 
-                // Set up the map view with initial coordinates and zoom level
                 const view = new MapView({
                     container: "viewDiv",
                     map: map,
-                    center: [-82.3248, 29.6516], // Gainesville, FL coordinates
+                    center: [-82.3248, 29.6516], // Map center in Gainesville
                     zoom: 12
                 });
 
                 view.when(() => {
                     console.log("MapView is loaded");
-
-                    // Add a "Locate" widget to find the user's location
+    // Add Locate button to find user's location
                     const locateBtn = new Locate({
                         view: view
                     });
-                    view.ui.add(locateBtn, { position: "top-left" });
 
-                    // Add a "Search" widget to allow users to find places
+                    view.ui.add(locateBtn, {
+                        position: "top-left"
+                    });
+         // Add Search widget for finding locations
                     const searchWidget = new Search({
                         view: view
                     });
-                    view.ui.add(searchWidget, { position: "top-left" });
 
-                    // Load and display the public art data from a feature layer
+                    view.ui.add(searchWidget, {
+                        position: "top-left"
+                    });
+// Feature layer with art data
                     const layer = new FeatureLayer({
-                        url: "YOUR_FEATURE_LAYER_URL", // Replace with your feature service URL
-                        popupTemplate: { // Define the popup template for displayed features
-                            title: "{give_me_it_a_name}", // Display field for title
+                        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                        popupTemplate: {
+                            title: "{give_me_it_a_name}",
                             content: [
                                 {
-                                    type: "fields", // Display fields in the popup
+                                    type: "fields",
                                     fieldInfos: [
-                                        { fieldName: "Description", label: "Description", visible: true },
-                                        { fieldName: "Location", label: "Location", visible: true }
+                                        {
+                                            fieldName: "Description",
+                                            label: "Description",
+                                            visible: true,
+                                            format: {
+                                                places: 0,
+                                                digitSeparator: false
+                                            }
+                                        },
+                                        {
+                                            fieldName: "Location",
+                                            label: "Location",
+                                            visible: true
+                                        }
                                     ]
                                 },
                                 {
-                                    type: "attachments", // Show image attachments
+                                    type: "attachments",
                                     displayType: "image",
-                                    attachmentInfos: { image: { size: 300 } }
+                                    attachmentInfos: {
+                                        image: {
+                                            size: 300
+                                        }
+                                    }
                                 }
                             ]
                         }
                     });
 
-                    map.add(layer); // Add the feature layer to the map
+                    map.add(layer);
 
-                    // Ensure header and infoBox remain visible when the popup closes
+                    // Manually position the popup to the right of the clicked point
+                    layer.on("click", function(event) {
+                        const screenPoint = {
+                            x: event.x,
+                            y: event.y
+                        };
+
+                        view.hitTest(screenPoint).then(function(response) {
+                            const graphic = response.results[0]?.graphic;
+                            if (graphic) {
+                                const popup = view.popup;
+                                popup.open({
+                                    location: event.mapPoint,
+                                    title: graphic.attributes["give_me_it_a_name"],
+                                    content: graphic,
+                                    // Increase the width of the popup to fit the image
+                                    width: 600,  // Increased width for larger content
+                                    height: 'auto', // Automatically adjust height
+                                });
+
+                                // Adjust popup location to the right of the clicked point
+                                const popupContainer = popup.domNode;
+                                const popupPosition = event.mapPoint;
+                                const popupWidth = popupContainer.offsetWidth;
+
+                                // Add offset to move the popup to the right
+                                const offsetX = 20;
+                                popupContainer.style.left = ${popupPosition.x + offsetX}px;
+
+                                // Adjust the Y position based on the popup height
+                                const popupHeight = popupContainer.offsetHeight;
+                                const offsetY = (popupHeight < 600) ? 20 : -20;  // Increase height check limit
+                                popupContainer.style.top = ${popupPosition.y + offsetY}px;
+                            }
+                        });
+                    });
+
+                    // Ensure the header and infoBox are unaffected when the popup is closed
                     view.popup.on("close", () => {
+                        // Ensure these elements stay visible even when the popup closes
                         document.querySelector("header").style.visibility = "visible";
                         infoBox.style.visibility = "visible";
                     });
@@ -201,21 +254,16 @@
     </script>
 </head>
 <body>
-    <!-- Header for the application -->
+    
     <header>Public Art Project</header>
-
-    <!-- Div where the map will be rendered -->
     <div id="viewDiv"></div>
-
-    <!-- Info box with project details and a button to add records -->
     <div class="infoBox">
+          <!-- Information box -->
         <h1>Public Art Project</h1>
         <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
         <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
         <p>Check out what others have found by clicking the red points on the map :)</p>
     </div>
-
-    <!-- Button to toggle the visibility of the info box -->
     <button class="toggleBtn">-</button>
 </body>
 </html>
