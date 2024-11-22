@@ -191,7 +191,7 @@
 
                     map.add(layer);
 
-                    // Manually position the popup to the right of the clicked point
+                    // Automatically position the popup to the right of the clicked point
                     layer.on("click", function(event) {
                         const screenPoint = {
                             x: event.x,
@@ -206,14 +206,13 @@
                                     location: event.mapPoint,
                                     title: graphic.attributes["give_me_it_a_name"],
                                     content: graphic,
-                                    // Increase the width of the popup to fit the image
+                                    // Set default position to the right of the point
                                     width: 600,  // Increased width for larger content
                                     height: 'auto', // Automatically adjust height
-                                    // Custom positioning logic to place the popup to the right
-                                    anchor: "right"
+                                    anchor: "right" // Popup will appear to the right by default
                                 });
 
-                                // Adjust popup location
+                                // Adjust the position of the popup
                                 const popupContainer = popup.domNode;
                                 const popupContent = popupContainer.querySelector('.esri-popup__main-container');
                                 const popupPosition = event.mapPoint;
