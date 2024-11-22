@@ -240,11 +240,11 @@
                         });
                     });
 
-                    // Close popup handler that will not affect other UI elements
+                    // Ensure the header and infoBox are unaffected when the popup is closed
                     view.popup.on("close", () => {
-                        // Ensure that the info box and header remain visible when the popup is closed
+                        // Do not touch the visibility of the header and infoBox here
+                        // Ensure these elements stay visible
                         infoBox.classList.remove("hidden");
-                        toggleBtn.textContent = "-";
                     });
                 });
             });
