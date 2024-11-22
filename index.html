@@ -191,7 +191,7 @@
 
                     map.add(layer);
 
-                    // Automatically position the popup to the right of the clicked point
+                    // Manually position the popup to the right of the clicked point
                     layer.on("click", function(event) {
                         const screenPoint = {
                             x: event.x,
@@ -206,23 +206,21 @@
                                     location: event.mapPoint,
                                     title: graphic.attributes["give_me_it_a_name"],
                                     content: graphic,
-                                    // Set default position to the right of the point
+                                    // Increase the width of the popup to fit the image
                                     width: 600,  // Increased width for larger content
                                     height: 'auto', // Automatically adjust height
-                                    anchor: "right" // Popup will appear to the right by default
                                 });
 
-                                // Adjust the position of the popup
+                                // Adjust popup location to the right of the clicked point
                                 const popupContainer = popup.domNode;
-                                const popupContent = popupContainer.querySelector('.esri-popup__main-container');
                                 const popupPosition = event.mapPoint;
                                 const popupWidth = popupContainer.offsetWidth;
 
-                                // Add an offset to the right for better placement
+                                // Add offset to move the popup to the right
                                 const offsetX = 20;
                                 popupContainer.style.left = `${popupPosition.x + offsetX}px`;
 
-                                // Update position dynamically if necessary
+                                // Adjust the Y position based on the popup height
                                 const popupHeight = popupContainer.offsetHeight;
                                 const offsetY = (popupHeight < 500) ? 20 : -20;
                                 popupContainer.style.top = `${popupPosition.y + offsetY}px`;
