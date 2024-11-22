@@ -26,37 +26,12 @@
             width: 250px;
             font-family: Arial, sans-serif;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .infoBox h1 {
-            font-size: 18px;
-            margin: 0 0 8px;
-        }
-
-        .infoBox p {
-            font-size: 14px;
-            margin: 0 0 12px;
-        }
-
-        .infoBox p:last-child {
-            margin-top: 20px;
-        }
-
-        .addRecordBtn {
-            display: inline-block;
-            background-color: #0079c1;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .addRecordBtn:hover {
-            background-color: #005a87;
+        .infoBox.hidden {
+            transform: scale(0.1);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .toggleBtn {
@@ -79,14 +54,6 @@
         .toggleBtn:hover {
             background: #f5f5f5;
         }
-
-        /* Hidden state for the info box */
-        .infoBox.hidden {
-            transform: scale(0.1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
     </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
     <script src="https://js.arcgis.com/4.26/"></script>
@@ -121,42 +88,47 @@
                     zoom: 12 
                 });
 
-                view.when(() => {
-                    console.log("MapView is loaded");
+                const locateBtn = new Locate({ view });
+                view.ui.add(locateBtn, { position: "top-left" });
 
-                    const locateBtn = new Locate({
-                        view: view
-                    });
+                const searchWidget = new Search({ view });
+                view.ui.add(searchWidget, { position: "top-left" });
 
-                    view.ui.add(locateBtn, {
-                        position: "top-left"
-                    });
+                const layer = new FeatureLayer({
+                    url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                    popupTemplate: {
+                        title: "{give_me_it_a_name}", 
+                        content: [
+                            {
+                                type: "fields",
+                                fieldInfos: []
+                            },
+                            {
+                                type: "attachments"
+                            }
+                        ]
+                    }
+                });
 
-                    const searchWidget = new Search({
-                        view: view
-                    });
+                map.add(layer);
 
-                    view.ui.add(searchWidget, {
-                        position: "top-left"
-                    });
+                view.popup.watch("selectedFeature", (selectedFeature) => {
+                    if (selectedFeature) {
+                        const popup = view.popup;
+                        popup.open({
+                            location: popup.location,
+                            title: selectedFeature.attributes["give_me_it_a_name"],
+                            content: selectedFeature,
+                            visible: true
+                        });
 
-                    const layer = new FeatureLayer({
-                        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                        popupTemplate: {
-                            title: "{give_me_it_a_name}", 
-                            content: [
-                                {
-                                    type: "fields",
-                                    fieldInfos: [] 
-                                },
-                                {
-                                    type: "attachments"
-                                }
-                            ]
+                        // Adjust popup height to fit content
+                        const popupContent = document.querySelector(".esri-popup__content");
+                        if (popupContent) {
+                            const contentHeight = popupContent.scrollHeight;
+                            popup.container.style.height = `${contentHeight + 50}px`; // Add padding
                         }
-                    });
-
-                    map.add(layer);
+                    }
                 });
             });
         });
