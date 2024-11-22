@@ -59,24 +59,24 @@
             background-color: #005a87;
         }
 
-        .minimizeBtn {
+        .toggleBtn {
             position: absolute;
             top: 8px;
             right: 8px;
             background: #ffffff;
             color: #c99000;
             border: none;
-            border-radius: 50%;
-            font-size: 16px;
-            width: 24px;
-            height: 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 4px 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .minimizeBtn:hover {
+        .toggleBtn:hover {
             background: #f5f5f5;
         }
 
@@ -93,11 +93,11 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const infoBox = document.querySelector(".infoBox");
-            const minimizeBtn = document.querySelector(".minimizeBtn");
+            const toggleBtn = document.querySelector(".toggleBtn");
 
-            minimizeBtn.addEventListener("click", () => {
+            toggleBtn.addEventListener("click", () => {
                 infoBox.classList.toggle("hidden");
-                minimizeBtn.textContent = infoBox.classList.contains("hidden") ? "+" : "-";
+                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
             });
 
             require([
@@ -165,11 +165,11 @@
 <body>
     <div id="viewDiv"></div>
     <div class="infoBox">
-        <button class="minimizeBtn">-</button>
         <h1>Public Art Mapper</h1>
         <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
         <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
         <p>Check out what others have found by clicking the red points on the map :)</p>
     </div>
+    <button class="toggleBtn">-</button>
 </body>
 </html>
