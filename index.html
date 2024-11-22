@@ -76,6 +76,7 @@
             border-radius: 50%;
         }
 
+        /* Minimized state */
         .minimized {
             height: 40px;
             overflow: hidden;
@@ -199,7 +200,9 @@
             // Add event listener for minimize button
             document.addEventListener("DOMContentLoaded", function() {
                 const minimizeBtn = document.querySelector(".minimizeBtn");
-                minimizeBtn.addEventListener("click", toggleInfoBox);
+                if (minimizeBtn) {
+                    minimizeBtn.addEventListener("click", toggleInfoBox);
+                }
             });
         });
     </script>
