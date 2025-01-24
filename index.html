@@ -100,8 +100,8 @@
 
         /* Popup image styling */
         .popup-image {
-            max-width: 100%;
-            height: auto;
+            max-width: 100% !important;
+            height: auto !important;
             display: block;
             margin: 10px auto;
         }
@@ -194,7 +194,7 @@
                                     displayType: "image",
                                     attachmentInfos: {
                                         image: {
-                                            size: 600
+                                            size: 0  // Set size to 0 to let the image be displayed in full size
                                         }
                                     }
                                 }
