@@ -98,12 +98,10 @@
             pointer-events: none;
         }
 
-        /* Popup image styling */
-        .popup-image {
+        /* Force popup images to fit within the popup */
+        .esri-popup-image {
             max-width: 100% !important;
             height: auto !important;
-            display: block;
-            margin: 10px auto;
         }
 
         .popup-text {
@@ -194,7 +192,7 @@
                                     displayType: "image",
                                     attachmentInfos: {
                                         image: {
-                                            size: 0  // Set size to 0 to let the image be displayed in full size
+                                            size: 0  // Let the image be displayed in full size
                                         }
                                     }
                                 }
