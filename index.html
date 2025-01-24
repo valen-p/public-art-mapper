@@ -12,6 +12,7 @@
            width: 100%;
        }
 
+
        /* Header styling */
        header {
            background-color: #c99000;
@@ -27,11 +28,12 @@
            z-index: 20;
        }
 
+
        /* Info box styling */
        .infoBox {
            position: absolute;
            z-index: 10;
-           top: 50px;
+           top: 50px; /* Adjusted for fixed header */
            right: 10px;
            background-color: #c99000;
            color: white;
@@ -43,15 +45,18 @@
            transition: transform 0.3s ease, opacity 0.3s ease;
        }
 
+
        .infoBox h1 {
            font-size: 18px;
            margin: 0 0 8px;
        }
 
+
        .infoBox p {
            font-size: 14px;
            margin: 0 0 12px;
        }
+
 
        /* Add Public Art button styling */
        .addRecordBtn {
@@ -67,14 +72,16 @@
            margin-bottom: 20px;
        }
 
+
        .addRecordBtn:hover {
            background-color: #005a87;
        }
 
+
        /* Toggle button styling */
        .toggleBtn {
            position: absolute;
-           top: 50px;
+           top: 50px; /* Adjusted for fixed header */
            right: 10px;
            background: #ffffff;
            color: #c99000;
@@ -87,18 +94,28 @@
            z-index: 20;
        }
 
+
        .toggleBtn:hover {
            background: #f5f5f5;
        }
 
+
+       /* Hidden state for the info box */
+       .infoBox.hidden {
+           transform: scale(0.1);
+           opacity: 0;
+           pointer-events: none;
+       }
+
+
        /* Popup image styling */
-       .esri-popup__content img {
+       .popup-image {
            max-width: 100%;
-           max-height: 300px;
+           height: auto;
            display: block;
            margin: 10px auto;
-           object-fit: contain;
        }
+
 
        .popup-text {
            white-space: pre-wrap;
@@ -113,11 +130,15 @@
            const infoBox = document.querySelector(".infoBox");
            const toggleBtn = document.querySelector(".toggleBtn");
 
+
+           // Toggle the visibility of the infoBox when button is clicked
            toggleBtn.addEventListener("click", () => {
                infoBox.classList.toggle("hidden");
                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
            });
 
+
+           // Load required ArcGIS modules
            require([
                "esri/config",
                "esri/Map",
@@ -126,11 +147,13 @@
                "esri/widgets/Search",
                "esri/layers/FeatureLayer"
            ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-               esriConfig.apiKey = "YOUR_API_KEY_HERE";
+               esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+
 
                const map = new Map({
                    basemap: "streets-night-vector"
                });
+
 
                const view = new MapView({
                    container: "viewDiv",
@@ -139,43 +162,79 @@
                    zoom: 12
                });
 
-               const layer = new FeatureLayer({
-                   url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                   popupTemplate: {
-                       title: "{give_me_it_a_name}",
-                       content: [
-                           {
-                               type: "fields",
-                               fieldInfos: [
-                                   { fieldName: "Description", label: "Description" },
-                                   { fieldName: "Location", label: "Location" }
-                               ]
-                           },
-                           {
-                               type: "attachments",
-                               displayType: "image",
-                               attachmentInfos: { image: { size: 300 } }
-                           }
-                       ]
-                   }
-               });
 
-               layer.when(() => {
-                   console.log("Layer loaded successfully");
-               }).catch((err) => {
-                   console.error("Layer failed to load:", err);
-               });
+               view.when(() => {
+                   console.log("MapView is loaded");
 
-               map.add(layer);
 
-               const locateBtn = new Locate({ view });
-               view.ui.add(locateBtn, "top-left");
+                   // Add Locate button to find user's location
+                   const locateBtn = new Locate({
+                       view: view
+                   });
 
-               const searchWidget = new Search({ view });
-               view.ui.add(searchWidget, "top-left");
 
-               view.popup.watch("visible", (visible) => {
-                   document.body.style.overflow = visible ? "hidden" : "auto";
+                   view.ui.add(locateBtn, {
+                       position: "top-left"
+                   });
+
+
+                   // Add Search widget for finding locations
+                   const searchWidget = new Search({
+                       view: view
+                   });
+
+
+                   view.ui.add(searchWidget, {
+                       position: "top-left"
+                   });
+
+
+                   // Feature layer with art data
+                   const layer = new FeatureLayer({
+                       url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                       popupTemplate: {
+                           title: "{give_me_it_a_name}",
+                           content: [
+                               {
+                                   type: "fields",
+                                   fieldInfos: [
+                                       {
+                                           fieldName: "Description",
+                                           label: "Description",
+                                           visible: true
+                                       },
+                                       {
+                                           fieldName: "Location",
+                                           label: "Location",
+                                           visible: true
+                                       }
+                                   ]
+                               },
+                               {
+                                   type: "attachments",
+                                   displayType: "image",
+                                   attachmentInfos: {
+                                       image: {
+                                           size: 600
+                                       }
+                                   }
+                               }
+                           ]
+                       }
+                   });
+
+
+                   map.add(layer);
+
+
+                   // Prevent scrolling when clicking on map points
+                   view.popup.watch("visible", (visible) => {
+                       if (visible) {
+                           document.body.style.overflow = "hidden";
+                       } else {
+                           document.body.style.overflow = "auto";
+                       }
+                   });
                });
            });
        });
