@@ -98,10 +98,10 @@
             pointer-events: none;
         }
 
-        /* Force popup images to fit within the popup */
+        /* Additional custom popup styles */
         .esri-popup-image {
-            max-width: 100% !important;
-            height: auto !important;
+            width: 100% !important;  /* Make the image fit the popup container */
+            height: auto !important; /* Keep the aspect ratio */
         }
 
         .popup-text {
@@ -202,9 +202,15 @@
 
                     map.add(layer);
 
-                    // Prevent scrolling when clicking on map points
+                    // Adjust image size when the popup is shown
                     view.popup.watch("visible", (visible) => {
                         if (visible) {
+                            const popup = view.popup;
+                            const images = popup.container.querySelectorAll("img");
+                            images.forEach(img => {
+                                img.style.maxWidth = "100%";  // Ensure image fills the popup width
+                                img.style.height = "auto";    // Maintain aspect ratio
+                            });
                             document.body.style.overflow = "hidden";
                         } else {
                             document.body.style.overflow = "auto";
