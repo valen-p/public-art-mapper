@@ -112,4 +112,119 @@
     </style>
     <!-- Link to ArcGIS styles and scripts -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
-    <script
+    <script src="https://js.arcgis.com/4.26/"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const infoBox = document.querySelector(".infoBox");
+            const toggleBtn = document.querySelector(".toggleBtn");
+
+            // Toggle the visibility of the infoBox when button is clicked
+            toggleBtn.addEventListener("click", () => {
+                infoBox.classList.toggle("hidden");
+                toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
+            });
+
+            // Load required ArcGIS modules
+            require([
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/widgets/Locate",
+                "esri/widgets/Search",
+                "esri/layers/FeatureLayer"
+            ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
+                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
+
+                const map = new Map({
+                    basemap: "streets-night-vector"
+                });
+
+                const view = new MapView({
+                    container: "viewDiv",
+                    map: map,
+                    center: [-82.3248, 29.6516], // Map center in Gainesville
+                    zoom: 12
+                });
+
+                view.when(() => {
+                    console.log("MapView is loaded");
+
+                    // Add Locate button to find user's location
+                    const locateBtn = new Locate({
+                        view: view
+                    });
+
+                    view.ui.add(locateBtn, {
+                        position: "top-left"
+                    });
+
+                    // Add Search widget for finding locations
+                    const searchWidget = new Search({
+                        view: view
+                    });
+
+                    view.ui.add(searchWidget, {
+                        position: "top-left"
+                    });
+
+                    // Feature layer with art data
+                    const layer = new FeatureLayer({
+                        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                        popupTemplate: {
+                            title: "{give_me_it_a_name}",
+                            content: [
+                                {
+                                    type: "fields",
+                                    fieldInfos: [
+                                        {
+                                            fieldName: "Description",
+                                            label: "Description",
+                                            visible: true
+                                        },
+                                        {
+                                            fieldName: "Location",
+                                            label: "Location",
+                                            visible: true
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "attachments",
+                                    displayType: "image",
+                                    attachmentInfos: {
+                                        image: {
+                                            size: 600
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    });
+
+                    map.add(layer);
+
+                    // Prevent scrolling when clicking on map points
+                    view.popup.watch("visible", (visible) => {
+                        if (visible) {
+                            document.body.style.overflow = "hidden";
+                        } else {
+                            document.body.style.overflow = "auto";
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>Public Art Project</header>
+    <div id="viewDiv"></div>
+    <div class="infoBox">
+        <h1>Public Art Project</h1>
+        <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
+        <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
+        <p>Check out what others have found by clicking the red points on the map :)</p>
+    </div>
+    <button class="toggleBtn">-</button>
+</body>
+</html>
