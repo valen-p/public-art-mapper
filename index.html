@@ -99,9 +99,12 @@
         }
 
         /* Additional custom popup styles */
-        .esri-popup-image {
-            width: 100% !important;  /* Make the image fit the popup container */
-            height: auto !important; /* Keep the aspect ratio */
+        .popup-image {
+            max-width: 100% !important; /* Ensure the image is contained within the popup */
+            max-height: 80vh !important; /* Set max-height to 80% of the viewport */
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain; /* Ensure the image fits the container without distortion */
         }
 
         .popup-text {
@@ -208,8 +211,7 @@
                             const popup = view.popup;
                             const images = popup.container.querySelectorAll("img");
                             images.forEach(img => {
-                                img.style.maxWidth = "100%";  // Ensure image fills the popup width
-                                img.style.height = "auto";    // Maintain aspect ratio
+                                img.classList.add("popup-image");  // Add the class to style the image
                             });
                             document.body.style.overflow = "hidden";
                         } else {
