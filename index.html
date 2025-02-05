@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="""en">
+<html lang="""en"></html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -132,9 +132,8 @@
               "esri/views/MapView",
               "esri/widgets/Locate",
               "esri/widgets/Search",
-              "esri/widgets/Zoom",
               "esri/layers/FeatureLayer"
-          ], (esriConfig, Map, MapView, Locate, Search, Zoom, FeatureLayer) => {
+          ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
               esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
               const map = new Map({
@@ -179,15 +178,9 @@
                       index: 2 // Lower the position slightly
                   });
 
-                  // Remove the custom Zoom widget to avoid duplication
-                  // const zoomWidget = new Zoom({
-                  //     view: view
-                  // });
-
-                  // view.ui.add(zoomWidget, {
-                  //     position: "top-left",
-                  //     index: 0 // Lower the position slightly
-                  // });
+                  // Move the default zoom controls down slightly
+                  view.ui.move("zoom", "top-left");
+                  view.ui.components = ["zoom", "compass", "attribution"];
 
                   // Feature layer with art data
                   const layer = new FeatureLayer({
