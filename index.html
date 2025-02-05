@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="""en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -179,15 +179,15 @@
                       index: 2 // Lower the position slightly
                   });
 
-                  // Add Zoom widget for zooming in and out
-                  const zoomWidget = new Zoom({
-                      view: view
-                  });
+                  // Remove the custom Zoom widget to avoid duplication
+                  // const zoomWidget = new Zoom({
+                  //     view: view
+                  // });
 
-                  view.ui.add(zoomWidget, {
-                      position: "top-left",
-                      index: 0 // Lower the position slightly
-                  });
+                  // view.ui.add(zoomWidget, {
+                  //     position: "top-left",
+                  //     index: 0 // Lower the position slightly
+                  // });
 
                   // Feature layer with art data
                   const layer = new FeatureLayer({
