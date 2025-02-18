@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="""en"></html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -97,19 +97,6 @@
           opacity: 0;
           pointer-events: none;
       }
-
-      /* Popup image styling */
-      .popup-image {
-          max-width: 100%;
-          height: auto;
-          display: block;
-          margin: 10px auto;
-      }
-
-      .popup-text {
-          white-space: pre-wrap;
-          overflow-wrap: break-word;
-      }
   </style>
   <!-- Link to ArcGIS styles and scripts -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
@@ -150,7 +137,7 @@
                       dockOptions: {
                           buttonEnabled: false,
                           breakpoint: false,
-                          position: "bottom-right" // Position the popup in the lower right corner
+                          position: "bottom-right"
                       }
                   }
               });
@@ -158,31 +145,36 @@
               view.when(() => {
                   console.log("MapView is loaded");
 
-                  // Add Locate button to find user's location
+                  // Adjust UI elements to be slightly lower
+                  view.ui.move("zoom", "top-left");
+                  view.ui.move("compass", "top-left");
+
+                  // Add Locate button and position it lower
                   const locateBtn = new Locate({
                       view: view
                   });
 
                   view.ui.add(locateBtn, {
                       position: "top-left",
-                      index: 1 // Lower the position slightly
+                      index: 1
                   });
 
-                  // Add Search widget for finding locations
+                  // Add Search widget and position it lower
                   const searchWidget = new Search({
                       view: view
                   });
 
                   view.ui.add(searchWidget, {
                       position: "top-left",
-                      index: 2 // Lower the position slightly
+                      index: 2
                   });
 
-                  // Move the default zoom controls down slightly
-                  view.ui.move("zoom", "top-left");
-                  view.ui.components = ["zoom", "compass", "attribution"];
+                  // Adjust padding so widgets appear below the header
+                  view.padding = {
+                      top: 60 // Moves all top-left widgets slightly lower
+                  };
 
-                  // Feature layer with art data
+                  // Feature layer with public art data
                   const layer = new FeatureLayer({
                       url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                       popupTemplate: {
