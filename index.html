@@ -260,6 +260,11 @@
                       const listItem = document.createElement("li");
                       listItem.innerHTML = `<strong>${title}</strong><br>${description}`;
                       feedList.prepend(listItem); // Add the new item to the top of the feed
+
+                      // Limit the feed to the last 3 entries
+                      while (feedList.children.length > 3) {
+                          feedList.removeChild(feedList.lastChild);
+                      }
                   }
 
                   // Example: Add a new item when a feature is added
