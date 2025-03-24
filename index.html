@@ -255,10 +255,16 @@
                   });
 
                   // Function to add a new item to the feed
-                  function addToFeed(title, description) {
+                  function addToFeed(title, description, imageUrl = null) {
                       const feedList = document.getElementById("feedList");
                       const listItem = document.createElement("li");
-                      listItem.innerHTML = `<strong>${title}</strong><br>${description}`;
+
+                      // Add title, description, and image (if available)
+                      listItem.innerHTML = `
+                          <strong>${title}</strong><br>
+                          ${description}
+                          ${imageUrl ? `<br><img src="${imageUrl}" alt="${title}" style="max-width: 100%; border-radius: 4px; margin-top: 8px;">` : ""}
+                      `;
                       feedList.prepend(listItem); // Add the new item to the top of the feed
 
                       // Limit the feed to the last 3 entries
@@ -273,7 +279,17 @@
                           event.addedFeatures.forEach((feature) => {
                               const title = feature.attributes["give_me_it_a_name"] || "Untitled";
                               const description = feature.attributes["Description"] || "No description available.";
-                              addToFeed(title, description);
+
+                              // Fetch attachments for the feature
+                              layer.queryAttachments({
+                                  objectIds: [feature.objectId]
+                              }).then((attachments) => {
+                                  const attachmentInfo = attachments[feature.objectId];
+                                  const imageUrl = attachmentInfo && attachmentInfo.length > 0 ? attachmentInfo[0].url : null;
+
+                                  // Add the feature to the feed with the image
+                                  addToFeed(title, description, imageUrl);
+                              });
                           });
                       }
                   });
