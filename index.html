@@ -67,3 +67,44 @@
               function updateFeed() {
                   layer.queryFeatures({
                       where: "1=1",
+                      outFields: ["give_me_it_a_name", "Description"],
+                      returnGeometry: false,
+                      orderByFields: ["objectid DESC"],
+                      num: 3
+                  }).then((result) => {
+                      const feedList = document.getElementById("feedList");
+                      feedList.innerHTML = "";
+                      result.features.forEach(feature => {
+                          const { give_me_it_a_name, Description, OBJECTID } = feature.attributes;
+                          layer.queryAttachments({
+                              objectIds: [OBJECTID]
+                          }).then(attachments => {
+                              let imageUrl = "";
+                              if (attachments[OBJECTID] && attachments[OBJECTID].length > 0) {
+                                  imageUrl = attachments[OBJECTID][0].url;
+                              }
+                              const listItem = document.createElement("li");
+                              listItem.innerHTML = `<strong>${give_me_it_a_name || "Untitled"}</strong><br>${Description || "No description."}<br>${imageUrl ? `<img src="${imageUrl}" style="max-width:100%;border-radius:4px;margin-top:8px;">` : ""}`;
+                              feedList.appendChild(listItem);
+                          });
+                      });
+                  }).catch(error => console.error("Error querying features:", error));
+              }
+
+              view.when(() => {
+                  updateFeed();
+                  setInterval(updateFeed, 60000);
+              });
+          });
+      });
+  </script>
+</head>
+<body>
+  <header>Public Art Project</header>
+  <div id="viewDiv"></div>
+  <div class="feedBox">
+      <h2>Recent Additions</h2>
+      <ul id="feedList"></ul>
+  </div>
+</body>
+</html>
