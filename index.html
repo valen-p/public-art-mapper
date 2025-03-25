@@ -12,7 +12,6 @@
           width: 100%;
       }
 
-      /* Header styling */
       header {
           background-color: #c99000;
           color: white;
@@ -27,78 +26,6 @@
           z-index: 20;
       }
 
-      /* Info box styling */
-      .infoBox {
-          position: absolute;
-          z-index: 10;
-          top: 50px; /* Adjusted for fixed header */
-          right: 10px;
-          background-color: #c99000;
-          color: white;
-          padding: 16px;
-          border-radius: 8px;
-          width: 250px;
-          font-family: Arial, sans-serif;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-          transition: transform 0.3s ease, opacity 0.3s ease;
-      }
-
-      .infoBox h1 {
-          font-size: 18px;
-          margin: 0 0 8px;
-      }
-
-      .infoBox p {
-          font-size: 14px;
-          margin: 0 0 12px;
-      }
-
-      /* Add Public Art button styling */
-      .addRecordBtn {
-          display: inline-block;
-          background-color: #0079c1;
-          color: white;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          cursor: pointer;
-          text-decoration: none;
-          margin-bottom: 20px;
-      }
-
-      .addRecordBtn:hover {
-          background-color: #005a87;
-      }
-
-      /* Toggle button styling */
-      .toggleBtn {
-          position: absolute;
-          top: 50px; /* Adjusted for fixed header */
-          right: 10px;
-          background: #ffffff;
-          color: #c99000;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          padding: 4px 8px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          z-index: 20;
-      }
-
-      .toggleBtn:hover {
-          background: #f5f5f5;
-      }
-
-      /* Hidden state for the info box */
-      .infoBox.hidden {
-          transform: scale(0.1);
-          opacity: 0;
-          pointer-events: none;
-      }
-
-      /* Feed box styling */
       .feedBox {
           position: absolute;
           bottom: 10px;
@@ -112,197 +39,61 @@
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
           z-index: 20;
           overflow-y: auto;
-          max-height: 200px;
-      }
-
-      .feedBox h2 {
-          font-size: 16px;
-          margin: 0 0 8px;
-      }
-
-      .feedBox ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-      }
-
-      .feedBox li {
-          font-size: 14px;
-          margin-bottom: 8px;
-          border-bottom: 1px solid #ddd;
-          padding-bottom: 4px;
+          max-height: 250px;
       }
   </style>
-  <!-- Link to ArcGIS styles and scripts -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.26/"></script>
   <script>
       document.addEventListener("DOMContentLoaded", () => {
-          const infoBox = document.querySelector(".infoBox");
-          const toggleBtn = document.querySelector(".toggleBtn");
-
-          // Toggle the visibility of the infoBox when button is clicked
-          toggleBtn.addEventListener("click", () => {
-              infoBox.classList.toggle("hidden");
-              toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
-          });
-
-          // Load required ArcGIS modules
-          require([
-              "esri/config",
-              "esri/Map",
-              "esri/views/MapView",
-              "esri/widgets/Locate",
-              "esri/widgets/Search",
-              "esri/layers/FeatureLayer"
-          ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
-              esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
-
-              const map = new Map({
-                  basemap: "streets"
-              });
-
+          require(["esri/config", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer"], 
+          (esriConfig, Map, MapView, FeatureLayer) => {
+              esriConfig.apiKey = "YOUR_API_KEY_HERE";
+              const map = new Map({ basemap: "streets" });
               const view = new MapView({
                   container: "viewDiv",
                   map: map,
-                  center: [-98.5795, 39.8283], // Map center in the US
-                  zoom: 4,
-                  popup: {
-                      dockEnabled: true,
-                      dockOptions: {
-                          buttonEnabled: false,
-                          breakpoint: false,
-                          position: "bottom-right"
-                      }
-                  }
+                  center: [-98.5795, 39.8283],
+                  zoom: 4
               });
 
-              view.when(() => {
-                  console.log("MapView is loaded");
+              const layer = new FeatureLayer({
+                  url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
+                  outFields: ["give_me_it_a_name", "Description"],
+                  returnAttachments: true
+              });
+              map.add(layer);
 
-                  // Adjust UI elements to be slightly lower
-                  view.ui.move("zoom", "top-left");
-                  view.ui.move("compass", "top-left");
-
-                  // Add Locate button and position it lower
-                  const locateBtn = new Locate({
-                      view: view
-                  });
-
-                  view.ui.add(locateBtn, {
-                      position: "top-left",
-                      index: 1
-                  });
-
-                  // Add Search widget and position it lower
-                  const searchWidget = new Search({
-                      view: view
-                  });
-
-                  view.ui.add(searchWidget, {
-                      position: "top-left",
-                      index: 2
-                  });
-
-                  // Adjust padding so widgets appear below the header
-                  view.padding = {
-                      top: 60 // Moves all top-left widgets slightly lower
-                  };
-
-                  // Feature layer with public art data
-                  const layer = new FeatureLayer({
-                      url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                      popupTemplate: {
-                          title: "{give_me_it_a_name}",
-                          content: [
-                              {
-                                  type: "fields",
-                                  fieldInfos: [
-                                      {
-                                          fieldName: "Description",
-                                          label: "Description",
-                                          visible: true
-                                      },
-                                      {
-                                          fieldName: "Location",
-                                          label: "Location",
-                                          visible: true
-                                      }
-                                  ]
-                              },
-                              {
-                                  type: "attachments",
-                                  displayType: "image",
-                                  attachmentInfos: {
-                                      image: {
-                                          size: 600
-                                      }
-                                  }
-                              }
-                          ]
-                      }
-                  });
-
-                  map.add(layer);
-
-                  // Prevent scrolling when clicking on map points
-                  view.popup.watch("visible", (visible) => {
-                      if (visible) {
-                          document.body.style.overflow = "hidden";
-                      } else {
-                          document.body.style.overflow = "auto";
-                      }
-                  });
-
-                  // Function to add a new item to the feed
-                  function addToFeed(title, description, imageUrl = null) {
+              function updateFeed() {
+                  layer.queryFeatures({
+                      where: "1=1",
+                      outFields: ["give_me_it_a_name", "Description"],
+                      returnGeometry: false,
+                      orderByFields: ["objectid DESC"],
+                      num: 3
+                  }).then((result) => {
                       const feedList = document.getElementById("feedList");
-                      const listItem = document.createElement("li");
-
-                      // Add title, description, and image (if available)
-                      listItem.innerHTML = `
-                          <strong>${title}</strong><br>
-                          ${description}
-                          ${imageUrl ? `<br><img src="${imageUrl}" alt="${title}" style="max-width: 100%; border-radius: 4px; margin-top: 8px;">` : ""}
-                      `;
-                      feedList.prepend(listItem); // Add the new item to the top of the feed
-
-                      // Limit the feed to the last 3 entries
-                      while (feedList.children.length > 3) {
-                          feedList.removeChild(feedList.lastChild);
-                      }
-                  }
-
-                  // Example: Add a new item when a feature is added
-                  layer.on("edits", (event) => {
-                      if (event.addedFeatures.length > 0) {
-                          event.addedFeatures.forEach((feature) => {
-                              const title = feature.attributes["give_me_it_a_name"] || "Untitled";
-                              const description = feature.attributes["Description"] || "No description available.";
-
-                              // Fetch attachments for the feature
-                              layer.queryAttachments({
-                                  objectIds: [feature.objectId]
-                              }).then((attachments) => {
-                                  console.log("Attachments fetched:", attachments); // Debugging log
-
-                                  const attachmentInfo = attachments[feature.objectId];
-                                  if (attachmentInfo && attachmentInfo.length > 0) {
-                                      const imageUrl = attachmentInfo[0].url; // Get the first attachment's URL
-                                      console.log("Image URL:", imageUrl); // Debugging log
-
-                                      // Add the feature to the feed with the image
-                                      addToFeed(title, description, imageUrl);
-                                  } else {
-                                      console.log("No attachments found for feature:", feature.objectId); // Debugging log
-                                      addToFeed(title, description); // Add without an image
-                                  }
-                              }).catch((error) => {
-                                  console.error("Error fetching attachments:", error); // Debugging log
-                              });
+                      feedList.innerHTML = "";
+                      result.features.forEach(feature => {
+                          const { give_me_it_a_name, Description } = feature.attributes;
+                          layer.queryAttachments({
+                              objectIds: [feature.attributes.OBJECTID]
+                          }).then(attachments => {
+                              let imageUrl = "";
+                              if (attachments[feature.attributes.OBJECTID] && attachments[feature.attributes.OBJECTID].length > 0) {
+                                  imageUrl = attachments[feature.attributes.OBJECTID][0].url;
+                              }
+                              const listItem = document.createElement("li");
+                              listItem.innerHTML = `<strong>${give_me_it_a_name || "Untitled"}</strong><br>${Description || "No description."}<br>${imageUrl ? `<img src="${imageUrl}" style="max-width:100%;border-radius:4px;margin-top:8px;">` : ""}`;
+                              feedList.appendChild(listItem);
                           });
-                      }
+                      });
                   });
+              }
+
+              view.when(() => {
+                  updateFeed();
+                  setInterval(updateFeed, 60000);
               });
           });
       });
@@ -311,24 +102,9 @@
 <body>
   <header>Public Art Project</header>
   <div id="viewDiv"></div>
-  <div class="infoBox">
-      <h1>Public Art Project</h1>
-      <p>Spot some amazing street art? Snap a pic and share it with others who love discovering public art too!</p>
-      <a href="https://arcg.is/19Lz8m" target="_blank" class="addRecordBtn">Add Public Art</a>
-      <p>Check out what others have found by clicking the red points on the map :)</p>
-  </div>
-  <button class="toggleBtn">-</button>
-  <div id="feed" class="feedBox">
+  <div class="feedBox">
       <h2>Recent Additions</h2>
       <ul id="feedList"></ul>
   </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
