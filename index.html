@@ -284,11 +284,21 @@
                               layer.queryAttachments({
                                   objectIds: [feature.objectId]
                               }).then((attachments) => {
-                                  const attachmentInfo = attachments[feature.objectId];
-                                  const imageUrl = attachmentInfo && attachmentInfo.length > 0 ? attachmentInfo[0].url : null;
+                                  console.log("Attachments fetched:", attachments); // Debugging log
 
-                                  // Add the feature to the feed with the image
-                                  addToFeed(title, description, imageUrl);
+                                  const attachmentInfo = attachments[feature.objectId];
+                                  if (attachmentInfo && attachmentInfo.length > 0) {
+                                      const imageUrl = attachmentInfo[0].url; // Get the first attachment's URL
+                                      console.log("Image URL:", imageUrl); // Debugging log
+
+                                      // Add the feature to the feed with the image
+                                      addToFeed(title, description, imageUrl);
+                                  } else {
+                                      console.log("No attachments found for feature:", feature.objectId); // Debugging log
+                                      addToFeed(title, description); // Add without an image
+                                  }
+                              }).catch((error) => {
+                                  console.error("Error fetching attachments:", error); // Debugging log
                               });
                           });
                       }
