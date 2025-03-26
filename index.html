@@ -264,7 +264,9 @@
                          results.features.forEach((feature) => {
                              const title = feature.attributes["give_me_it_a_name"] || "Untitled";
                              const description = feature.attributes["Description"] || "No description available.";
-                             const location = feature.geometry ? `${feature.geometry.latitude.toFixed(4)}, ${feature.geometry.longitude.toFixed(4)}` : "No location available";
+                             const location = feature.geometry
+                                 ? `${feature.geometry.latitude.toFixed(4)}, ${feature.geometry.longitude.toFixed(4)}`
+                                 : "No location available";
 
                              // Fetch attachments for the feature
                              layer.queryAttachments({
@@ -279,7 +281,7 @@
                                      <strong>${title}</strong><br>
                                      ${description}<br>
                                      <em>Location: ${location}</em>
-                                     ${imageUrl ? `<br><img src="${imageUrl}" alt="${title}" style="max-width: 100%; border-radius: 4px; margin-top: 8px;">` : ""}
+                                     ${imageUrl ? `<br><img src="${imageUrl}" alt="${title}" style="max-width: 100px; max-height: 100px; border-radius: 4px; margin-top: 8px;">` : ""}
                                  `;
                                  feedList.appendChild(listItem);
                              }).catch((error) => {
