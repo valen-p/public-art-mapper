@@ -255,7 +255,7 @@
                          where: "1=1", // Query all features
                          orderByFields: ["CreationDate DESC"], // Sort by creation date (newest first)
                          outFields: ["give_me_it_a_name", "Description"], // Fields to retrieve
-                         returnGeometry: false,
+                         returnGeometry: true, // Include geometry to get location
                          num: 3 // Limit to the last 3 entries
                      }).then((results) => {
                          const feedList = document.getElementById("feedList");
@@ -264,11 +264,36 @@
                          results.features.forEach((feature) => {
                              const title = feature.attributes["give_me_it_a_name"] || "Untitled";
                              const description = feature.attributes["Description"] || "No description available.";
+                             const location = feature.geometry ? `${feature.geometry.latitude.toFixed(4)}, ${feature.geometry.longitude.toFixed(4)}` : "No location available";
 
-                             // Add each entry to the feed
-                             const listItem = document.createElement("li");
-                             listItem.innerHTML = `<strong>${title}</strong><br>${description}`;
-                             feedList.appendChild(listItem);
+                             // Fetch attachments for the feature
+                             layer.queryAttachments({
+                                 objectIds: [feature.attributes.OBJECTID]
+                             }).then((attachments) => {
+                                 const attachmentInfo = attachments[feature.attributes.OBJECTID];
+                                 const imageUrl = attachmentInfo && attachmentInfo.length > 0 ? attachmentInfo[0].url : null;
+
+                                 // Add each entry to the feed
+                                 const listItem = document.createElement("li");
+                                 listItem.innerHTML = `
+                                     <strong>${title}</strong><br>
+                                     ${description}<br>
+                                     <em>Location: ${location}</em>
+                                     ${imageUrl ? `<br><img src="${imageUrl}" alt="${title}" style="max-width: 100%; border-radius: 4px; margin-top: 8px;">` : ""}
+                                 `;
+                                 feedList.appendChild(listItem);
+                             }).catch((error) => {
+                                 console.error("Error fetching attachments:", error);
+
+                                 // Add entry without an image if there's an error
+                                 const listItem = document.createElement("li");
+                                 listItem.innerHTML = `
+                                     <strong>${title}</strong><br>
+                                     ${description}<br>
+                                     <em>Location: ${location}</em>
+                                 `;
+                                 feedList.appendChild(listItem);
+                             });
                          });
                      }).catch((error) => {
                          console.error("Error querying features:", error);
