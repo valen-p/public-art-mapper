@@ -106,6 +106,41 @@
          opacity: 0;
          pointer-events: none;
      }
+
+     /* Feed box styling */
+     .feedBox {
+         position: absolute;
+         bottom: 10px;
+         left: 10px;
+         background-color: #ffffff;
+         color: #333333;
+         padding: 16px;
+         border-radius: 8px;
+         width: 300px;
+         font-family: Arial, sans-serif;
+         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+         z-index: 20;
+         overflow-y: auto;
+         max-height: 200px;
+     }
+
+     .feedBox h2 {
+         font-size: 16px;
+         margin: 0 0 8px;
+     }
+
+     .feedBox ul {
+         list-style: none;
+         padding: 0;
+         margin: 0;
+     }
+
+     .feedBox li {
+         font-size: 14px;
+         margin-bottom: 8px;
+         border-bottom: 1px solid #ddd;
+         padding-bottom: 4px;
+     }
  </style>
  <!-- Link to ArcGIS styles and scripts -->
  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
@@ -198,35 +233,7 @@
                  // Feature layer with public art data
                  const layer = new FeatureLayer({
                      url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                     popupTemplate: {
-                         title: "{give_me_it_a_name}",
-                         content: [
-                             {
-                                 type: "fields",
-                                 fieldInfos: [
-                                     {
-                                         fieldName: "Description",
-                                         label: "Description",
-                                         visible: true
-                                     },
-                                     {
-                                         fieldName: "Location",
-                                         label: "Location",
-                                         visible: true
-                                     }
-                                 ]
-                             },
-                             {
-                                 type: "attachments",
-                                 displayType: "image",
-                                 attachmentInfos: {
-                                     image: {
-                                         size: 600
-                                     }
-                                 }
-                             }
-                         ]
-                     }
+                     outFields: ["give_me_it_a_name", "Description", "CreationDate"]
                  });
 
 
@@ -241,6 +248,36 @@
                          document.body.style.overflow = "auto";
                      }
                  });
+
+                 function updateFeed() {
+                     // Query the last three entries from the FeatureLayer
+                     layer.queryFeatures({
+                         where: "1=1", // Query all features
+                         orderByFields: ["CreationDate DESC"], // Sort by creation date (newest first)
+                         outFields: ["give_me_it_a_name", "Description"], // Fields to retrieve
+                         returnGeometry: false,
+                         num: 3 // Limit to the last 3 entries
+                     }).then((results) => {
+                         const feedList = document.getElementById("feedList");
+                         feedList.innerHTML = ""; // Clear the feed
+
+                         results.features.forEach((feature) => {
+                             const title = feature.attributes["give_me_it_a_name"] || "Untitled";
+                             const description = feature.attributes["Description"] || "No description available.";
+
+                             // Add each entry to the feed
+                             const listItem = document.createElement("li");
+                             listItem.innerHTML = `<strong>${title}</strong><br>${description}`;
+                             feedList.appendChild(listItem);
+                         });
+                     }).catch((error) => {
+                         console.error("Error querying features:", error);
+                     });
+                 }
+
+                 // Call updateFeed initially and set an interval to refresh it every 30 seconds
+                 updateFeed();
+                 setInterval(updateFeed, 30000);
              });
          });
      });
@@ -256,5 +293,9 @@
      <p>Check out what others have found by clicking the red points on the map :)</p>
  </div>
  <button class="toggleBtn">-</button>
+ <div id="feed" class="feedBox">
+     <h2>Recent Additions</h2>
+     <ul id="feedList"></ul>
+ </div>
 </body>
 </html>
