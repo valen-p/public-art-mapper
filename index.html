@@ -282,6 +282,8 @@
                                  const attachmentInfo = attachments[feature.attributes.OBJECTID];
                                  const imageUrl = attachmentInfo && attachmentInfo.length > 0 ? attachmentInfo[0].url : null;
 
+                                 console.log("Image URL:", imageUrl); // Debugging log
+
                                  // Add each entry to the feed
                                  const listItem = document.createElement("li");
                                  listItem.innerHTML = `
