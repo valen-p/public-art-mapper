@@ -127,22 +127,14 @@
              esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
              const map = new Map({
-                 basemap: "streets"
+                 basemap: "streets" // Ensure this is a valid basemap
              });
 
              const view = new MapView({
-                 container: "viewDiv",
+                 container: "viewDiv", // This must match the id of your map container
                  map: map,
-                 center: [-98.5795, 39.8283], // Map center in the US
-                 zoom: 4,
-                 popup: {
-                     dockEnabled: true,
-                     dockOptions: {
-                         buttonEnabled: false,
-                         breakpoint: false,
-                         position: "bottom-right"
-                     }
-                 }
+                 center: [-98.5795, 39.8283], // Longitude, latitude
+                 zoom: 4
              });
 
              view.when(() => {
