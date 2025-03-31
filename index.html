@@ -233,7 +233,14 @@
                  // Feature layer with public art data
                  const layer = new FeatureLayer({
                      url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
-                     outFields: ["give_me_it_a_name", "Description", "CreationDate"]
+                     outFields: ["give_me_it_a_name", "Description", "CreationDate"], // Fields to retrieve
+                     popupTemplate: {
+                         title: "{give_me_it_a_name}",
+                         content: `
+                             <p><strong>Description:</strong> {Description}</p>
+                             <p><strong>Creation Date:</strong> {CreationDate}</p>
+                         `
+                     }
                  });
 
 
