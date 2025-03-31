@@ -12,116 +12,108 @@
          width: 100%;
      }
 
-
-     /* Header styling */
      header {
-         background-color: #c99000;
+         background: linear-gradient(90deg, #c99000, #e6a700);
          color: white;
          text-align: center;
-         padding: 10px 0;
-         font-family: Arial, sans-serif;
-         font-size: 18px;
+         padding: 15px 0;
+         font-family: 'Roboto', Arial, sans-serif;
+         font-size: 20px;
          font-weight: bold;
          position: fixed;
          top: 0;
          width: 100%;
          z-index: 20;
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+         letter-spacing: 1px;
      }
 
-
-     /* Info box styling */
      .infoBox {
          position: absolute;
          z-index: 10;
-         top: 50px; /* Adjusted for fixed header */
-         right: 10px;
-         background-color: #c99000;
-         color: white;
-         padding: 16px;
-         border-radius: 8px;
-         width: 250px;
-         font-family: Arial, sans-serif;
-         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+         top: 70px;
+         right: 20px;
+         background-color: #ffffff;
+         color: #333333;
+         padding: 20px;
+         border-radius: 12px;
+         width: 280px;
+         font-family: 'Roboto', Arial, sans-serif;
+         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
          transition: transform 0.3s ease, opacity 0.3s ease;
      }
 
-
      .infoBox h1 {
-         font-size: 18px;
-         margin: 0 0 8px;
+         font-size: 20px;
+         margin: 0 0 12px;
+         color: #c99000;
      }
-
 
      .infoBox p {
          font-size: 14px;
-         margin: 0 0 12px;
+         margin: 0 0 16px;
+         line-height: 1.5;
+         color: #555555;
      }
 
-
-     /* Add Public Art button styling */
      .addRecordBtn {
          display: inline-block;
          background-color: #0079c1;
          color: white;
-         padding: 8px 16px;
+         padding: 10px 18px;
          border: none;
-         border-radius: 4px;
+         border-radius: 6px;
          font-size: 14px;
          cursor: pointer;
          text-decoration: none;
          margin-bottom: 20px;
+         transition: background-color 0.3s ease;
      }
-
 
      .addRecordBtn:hover {
          background-color: #005a87;
      }
 
-
-     /* Toggle button styling */
      .toggleBtn {
          position: absolute;
-         top: 50px; /* Adjusted for fixed header */
-         right: 10px;
+         top: 70px;
+         right: 20px;
          background: #ffffff;
          color: #c99000;
-         border: none;
-         border-radius: 4px;
-         font-size: 14px;
-         padding: 4px 8px;
+         border: 2px solid #c99000;
+         border-radius: 50%;
+         font-size: 16px;
+         padding: 8px 12px;
          cursor: pointer;
-         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
          z-index: 20;
+         transition: background 0.3s ease, transform 0.2s ease;
      }
-
 
      .toggleBtn:hover {
          background: #f5f5f5;
+         transform: scale(1.1);
      }
 
-
-     /* Hidden state for the info box */
-     .infoBox.hidden {
-         transform: scale(0.1);
-         opacity: 0;
-         pointer-events: none;
+     #viewDiv {
+         border: 2px solid #e6a700;
+         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+         border-radius: 8px;
      }
  </style>
  <!-- Link to ArcGIS styles and scripts -->
  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
- <script src="https://js.arcgis.com/4.26/"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
  <script>
      document.addEventListener("DOMContentLoaded", () => {
          const infoBox = document.querySelector(".infoBox");
          const toggleBtn = document.querySelector(".toggleBtn");
-
 
          // Toggle the visibility of the infoBox when button is clicked
          toggleBtn.addEventListener("click", () => {
              infoBox.classList.toggle("hidden");
              toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
          });
-
 
          // Load required ArcGIS modules
          require([
@@ -134,11 +126,9 @@
          ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
              esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
-
              const map = new Map({
                  basemap: "streets"
              });
-
 
              const view = new MapView({
                  container: "viewDiv",
@@ -155,83 +145,56 @@
                  }
              });
 
-
              view.when(() => {
                  console.log("MapView is loaded");
-
 
                  // Adjust UI elements to be slightly lower
                  view.ui.move("zoom", "top-left");
                  view.ui.move("compass", "top-left");
-
 
                  // Add Locate button and position it lower
                  const locateBtn = new Locate({
                      view: view
                  });
 
-
                  view.ui.add(locateBtn, {
                      position: "top-left",
                      index: 1
                  });
-
 
                  // Add Search widget and position it lower
                  const searchWidget = new Search({
                      view: view
                  });
 
-
                  view.ui.add(searchWidget, {
                      position: "top-left",
                      index: 2
                  });
-
 
                  // Adjust padding so widgets appear below the header
                  view.padding = {
                      top: 60 // Moves all top-left widgets slightly lower
                  };
 
-
                  // Feature layer with public art data
                  const layer = new FeatureLayer({
                      url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                      popupTemplate: {
                          title: "{give_me_it_a_name}",
-                         content: [
-                             {
-                                 type: "fields",
-                                 fieldInfos: [
-                                     {
-                                         fieldName: "Description",
-                                         label: "Description",
-                                         visible: true
-                                     },
-                                     {
-                                         fieldName: "Location",
-                                         label: "Location",
-                                         visible: true
-                                     }
-                                 ]
-                             },
-                             {
-                                 type: "attachments",
-                                 displayType: "image",
-                                 attachmentInfos: {
-                                     image: {
-                                         size: 600
-                                     }
-                                 }
-                             }
-                         ]
+                         content: `
+                             <div style="font-family: 'Roboto', Arial, sans-serif; color: #333;">
+                                 <p><strong>Description:</strong> {Description}</p>
+                                 <p><strong>Location:</strong> {Location}</p>
+                                 <p><strong>Attachments:</strong></p>
+                                 <ul>
+                                     <li><a href="{attachmentInfos[0].url}" target="_blank" style="color: #0079c1; text-decoration: none;">View Image</a></li>
+                                 </ul>
+                             </div>
+                         `
                      }
                  });
-
-
                  map.add(layer);
-
 
                  // Prevent scrolling when clicking on map points
                  view.popup.watch("visible", (visible) => {
@@ -256,6 +219,19 @@
      <p>Check out what others have found by clicking the red points on the map :)</p>
  </div>
  <button class="toggleBtn">-</button>
+ <div class="feedBox">
+     <h2>Recent Art Submissions</h2>
+     <ul>
+         <li>
+             <strong>Title:</strong> Beautiful Mural
+             <img src="mural.jpg" alt="Beautiful Mural">
+         </li>
+         <li>
+             <strong>Title:</strong> Abstract Sculpture
+             <img src="sculpture.jpg" alt="Abstract Sculpture">
+         </li>
+     </ul>
+ </div>
 </body>
 </html>
 
