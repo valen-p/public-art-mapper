@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="initial-scale-1, maximum-scale=1, user-scalable=no" />
     <title>Public Art Mapper</title>
     <link rel="icon" href="path/to/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
@@ -184,8 +184,9 @@
                                     <p><strong>Location:</strong> {Location}</p>
                                     <p><strong>Attachments:</strong></p>
                                     ${
+                                        // Check if attachments exist and display the first image
                                         "{attachmentInfos}" 
-                                        ? `<ul><li><a href="{attachmentInfos[0].url}" target="_blank" style="color: #0079c1; text-decoration: none;">View Image</a></li></ul>` 
+                                        ? `<img src="{attachmentInfos[0].url}" alt="Attachment" style="max-width: 100%; border-radius: 8px; margin-top: 8px;">` 
                                         : `<p>No attachments available</p>`
                                     }
                                 </div>
