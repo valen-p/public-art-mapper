@@ -154,7 +154,7 @@
                      url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                      featureReduction: {
                          type: "cluster",
-                         clusterRadius: "100px",
+                         clusterRadius: "35px", // smaller radius = tighter clusters
                          popupTemplate: {
                              title: "Cluster of {cluster_count} Art Pieces",
                              content: "Zoom in to see individual art pieces."
@@ -165,8 +165,11 @@
                                  labelExpressionInfo: { expression: "Text($feature.cluster_count, '#')" },
                                  symbol: {
                                      type: "text",
-                                     color: "white",
-                                     font: { weight: "bold", size: "14px" }
+                                     color: "black", // changed to black
+                                     font: {
+                                         weight: "bold",
+                                         size: "14px"
+                                     }
                                  }
                              }
                          ]
@@ -212,4 +215,3 @@
  <button class="toggleBtn">-</button>
 </body>
 </html>
-
