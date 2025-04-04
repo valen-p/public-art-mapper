@@ -4,11 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>Public Art Mapper</title>
-
-<!-- Load Boldonse font (replace with a real font link if needed) -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<!-- If Boldonse is a custom font you have locally or hosted, replace the line above with the correct link or @font-face -->
-
 <style>
     html, body, #viewDiv {
         padding: 0;
@@ -17,93 +12,103 @@
         width: 100%;
     }
 
-    header {
-        background: transparent;
-        color: black;
-        text-align: center;
-        padding: 20px 0;
-        font-family: 'Boldonse', Arial, sans-serif; 
-        font-size: 28px;
-        font-weight: bold;
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 20;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        letter-spacing: 1px;
-    }
 
-    .infoBox {
-        position: absolute;
-        z-index: 10;
-        top: 70px;
-        right: 20px;
-        background-color: #ffffff;
-        color: #333333;
-        padding: 20px;
-        border-radius: 12px;
-        width: 240px;
-        font-family: 'Roboto', Arial, sans-serif;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
+ header {
+          background: linear-gradient(90deg, #c99000, #e6a700);
+          color: white;
+          text-align: center;
+          padding: 15px 0;
+          font-family: 'Roboto', Arial, sans-serif;
+          font-size: 20px;
+          font-weight: bold;
+          position: fixed;
+          top: 0;
+          width: 100%;
+          z-index: 20;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+          letter-spacing: 1px;
+      }
 
-    .infoBox h1 {
-        font-size: 20px;
-        margin: 0 0 12px;
-        color: #c99000;
-    }
 
-    .infoBox p {
-        font-size: 14px;
-        margin: 0 0 16px;
-        line-height: 1.5;
-        color: #555555;
-    }
+      .infoBox {
+          position: absolute;
+          z-index: 10;
+          top: 70px;
+          right: 20px;
+          background-color: #ffffff;
+          color: #333333;
+          padding: 20px;
+          border-radius: 12px;
+          width: 240px;
+          font-family: 'Roboto', Arial, sans-serif;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          transition: transform 0.3s ease, opacity 0.3s ease;
+      }
 
-    .addRecordBtn {
-        display: inline-block;
-        background-color: #0079c1;
-        color: white;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        text-decoration: none;
-        margin-bottom: 20px;
-        transition: background-color 0.3s ease;
-    }
 
-    .addRecordBtn:hover {
-        background-color: #005a87;
-    }
+      .infoBox h1 {
+          font-size: 20px;
+          margin: 0 0 12px;
+          color: #c99000;
+      }
 
-    .toggleBtn {
-        position: absolute;
-        top: 70px;
-        right: 20px;
-        background: #ffffff;
-        color: #c99000;
-        border: 2px solid #c99000;
-        border-radius: 50%;
-        font-size: 16px;
-        padding: 8px 12px;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        z-index: 20;
-        transition: background 0.3s ease, transform 0.2s ease;
-    }
 
-    .toggleBtn:hover {
-        background: #f5f5f5;
-        transform: scale(1.1);
-    }
+      .infoBox p {
+          font-size: 14px;
+          margin: 0 0 16px;
+          line-height: 1.5;
+          color: #555555;
+      }
 
-    .hidden {
-        display: none;
-    }
-</style>
+
+      .addRecordBtn {
+          display: inline-block;
+          background-color: #0079c1;
+          color: white;
+          padding: 10px 18px;
+          border: none;
+          border-radius: 6px;
+          font-size: 14px;
+          cursor: pointer;
+          text-decoration: none;
+          margin-bottom: 20px;
+          transition: background-color 0.3s ease;
+      }
+
+
+      .addRecordBtn:hover {
+          background-color: #005a87;
+      }
+
+
+      .toggleBtn {
+          position: absolute;
+          top: 70px;
+          right: 20px;
+          background: #ffffff;
+          color: #c99000;
+          border: 2px solid #c99000;
+          border-radius: 50%;
+          font-size: 16px;
+          padding: 8px 12px;
+          cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 20;
+          transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+
+      .toggleBtn:hover {
+          background: #f5f5f5;
+          transform: scale(1.1);
+      }
+
+
+      .hidden {
+          display: none;
+      }
+  </style>
+
 
 <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
 <script src="https://js.arcgis.com/4.26/"></script>
@@ -112,10 +117,12 @@
         const infoBox = document.querySelector(".infoBox");
         const toggleBtn = document.querySelector(".toggleBtn");
 
+
         toggleBtn.addEventListener("click", () => {
             infoBox.classList.toggle("hidden");
             toggleBtn.textContent = infoBox.classList.contains("hidden") ? "Add Public Art!" : "-";
         });
+
 
         require([
             "esri/config",
@@ -127,9 +134,11 @@
         ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
             esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurGOndvn56RaIuEG-ymH-92haus5XOWjwfQcNHTRTeMO7efrrwIO_P1WvjAaKi6OQjJ3GIY_futaMIJKN2YL-EYHTHG9Rv2I800yOHi-R0CETmNtIv1jHJiXDbTrmTiJeXLEP-6WMH6Zj1mNwmZT3z5l5nB_2nXXSVTEuDcqBFo737s7VpsbqFXNy4GrGXkfT9juBGmdeoQdWJ8oZqkquRShfozv5LIG5tRroi4bCPx5GAT1_IuAFCiIJ";
 
+
             const map = new Map({
                 basemap: "streets"
             });
+
 
             const view = new MapView({
                 container: "viewDiv",
@@ -146,20 +155,24 @@
                 }
             });
 
+
             view.when(() => {
                 const locateBtn = new Locate({ view: view });
                 view.ui.add(locateBtn, { position: "top-left", index: 1 });
 
+
                 const searchWidget = new Search({ view: view });
                 view.ui.add(searchWidget, { position: "top-left", index: 2 });
 
+
                 view.padding = { top: 60 };
+
 
                 const layer = new FeatureLayer({
                     url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/survey123_15532538214a405c94a5d719afc09246_results/FeatureServer",
                     featureReduction: {
                         type: "cluster",
-                        clusterRadius: "35px",
+                        clusterRadius: "35px", // smaller radius = tighter clusters
                         popupTemplate: {
                             title: "Cluster of {cluster_count} Art Pieces",
                             content: "Zoom in to see individual art pieces."
@@ -170,7 +183,7 @@
                                 labelExpressionInfo: { expression: "Text($feature.cluster_count, '#')" },
                                 symbol: {
                                     type: "text",
-                                    color: "black",
+                                    color: "black", // changed to black
                                     font: {
                                         weight: "bold",
                                         size: "14px"
@@ -198,7 +211,9 @@
                     }
                 });
 
+
                 map.add(layer);
+
 
                 view.popup.watch("visible", (visible) => {
                     document.body.style.overflow = visible ? "hidden" : "auto";
@@ -209,7 +224,7 @@
 </script>
 </head>
 <body>
-<header>Public Art Mapper</header>
+<header>Public Art Project</header>
 <div id="viewDiv"></div>
 <div class="infoBox">
     <h1>Public Art Project</h1>
@@ -220,3 +235,15 @@
 <button class="toggleBtn">-</button>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
